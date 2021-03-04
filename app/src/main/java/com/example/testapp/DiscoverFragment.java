@@ -7,58 +7,43 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DiscoverFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DiscoverFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DiscoverFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DiscoverFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DiscoverFragment newInstance(String param1, String param2) {
-        DiscoverFragment fragment = new DiscoverFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    // The onCreateView method is called when Fragment should create its View object hierarchy,
+    // either dynamically or via XML layout inflation.
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        // Defines the xml file for the fragment
+        return inflater.inflate(R.layout.fragment_discover, parent, false);
     }
 
+    // This event is triggered soon after onCreateView().
+    // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_discover, container, false);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // Setup any handles to view objects here
+        // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
+        ImageView image1 = view.findViewById(R.id.imageView);
+        ImageView image2 = view.findViewById(R.id.imageView2);
+        ImageView image3 = view.findViewById(R.id.imageView3);
+        ImageView image4 = view.findViewById(R.id.imageView21);
+        ImageView image5 = view.findViewById(R.id.imageView22);
+        ImageView image6 = view.findViewById(R.id.imageView23);
+        ImageView image7 = view.findViewById(R.id.imageView31);
+        ImageView image8 = view.findViewById(R.id.imageView32);
+        ImageView image9 = view.findViewById(R.id.imageView33);
+        image1.setImageResource(R.drawable.res1);
+        image2.setImageResource(R.drawable.res2);
+        image3.setImageResource(R.drawable.res3);
+        image4.setImageResource(R.drawable.res4);
+        image5.setImageResource(R.drawable.res5);
+        image6.setImageResource(R.drawable.res6);
+        image7.setImageResource(R.drawable.res7);
+        image8.setImageResource(R.drawable.res8);
+        image9.setImageResource(R.drawable.res9);
+
     }
 }
