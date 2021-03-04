@@ -13,3 +13,5 @@
         android:title="Profile"
         android:icon="@drawable/ic_baseline_account_circle_24"/>
 </menu>
+    <!--Material design guidelines for bottom nav style and behavior-->
+    <!--https://material.io/components/bottom-navigation#behavior-->
