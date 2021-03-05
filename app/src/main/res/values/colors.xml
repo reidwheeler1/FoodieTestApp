@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="foodie_red">#E63946</color>
+    <color name="foodie_dark_red">#AF212C</color>
 </resources>

@@ -10,6 +10,7 @@
         android:title="Quiz" />
     <item
         android:id="@+id/profile"
+        android:enabled="true"
         android:icon="@drawable/ic_favorite_24px"
         android:title="Likes" />
 </menu>
