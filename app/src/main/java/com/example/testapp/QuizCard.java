@@ -149,6 +149,11 @@ public class QuizCard extends Fragment {
         manager.setCanScrollHorizontal(true); //Enables card to move on horizontal axis
         //manager.setCanScrollVertical(true); //Enables card to move on vertical axis, regardless of set Direction
 
+        // Adding Stackable Cards
+        manager.setStackFrom(StackFrom.Top);
+        manager.setVisibleCount(3);
+        manager.setTranslationInterval(4.0f);
+
         //SwipeableMethod determines whether buttons are used (Automatic) or touch-and-drag (Manual)
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
 
