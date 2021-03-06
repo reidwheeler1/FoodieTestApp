@@ -81,6 +81,7 @@
 
 <!--For Swipe Ups: Disabled-->
 <!--If enabled, replace current drawable vector asset with appropriate icon-->
+<!--AND Remove visibility attribute-->
     <FrameLayout
         android:id="@+id/top_overlay"
         android:layout_width="match_parent"
@@ -91,12 +92,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_upward_24"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
 
     </FrameLayout>
 
 <!--For Swipe Downs: Disabled-->
 <!--If enabled, replace current drawable vector asset with appropriate icon-->
+<!--AND Remove visibility attribute-->
     <FrameLayout
         android:id="@+id/bottom_overlay"
         android:layout_width="match_parent"
@@ -107,7 +110,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_downward_24"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
 
     </FrameLayout>
 

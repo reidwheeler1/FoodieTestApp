@@ -95,7 +95,8 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
-                if (direction == Direction.Right) {
+                //Toasts display the message at the bottom of the screen, but linger around too long for this purpose
+/*                if (direction == Direction.Right) {
                     Toast.makeText(getContext(), "Direction Right", Toast.LENGTH_SHORT).show();
                 }
                 if (direction == Direction.Left) {
@@ -106,7 +107,7 @@ public class QuizCard extends Fragment {
                 }
                 if (direction == Direction.Bottom) {
                     Toast.makeText(getContext(), "Direction Bottom", Toast.LENGTH_SHORT).show();
-                }
+                }*/
 
                 //If getItemCount - <number> == 0, paginate card stack
                 //TODO: Look into changing this logic (potential for errors)

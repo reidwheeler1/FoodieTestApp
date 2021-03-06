@@ -7,7 +7,7 @@
     <item
         android:id="@+id/quiz"
         android:icon="@drawable/ic_view_carousel_black_36dp"
-        android:title="Quiz" />
+        android:title="Suggestions" />
     <item
         android:id="@+id/profile"
         android:enabled="true"
