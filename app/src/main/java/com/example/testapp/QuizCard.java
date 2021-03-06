@@ -190,18 +190,22 @@ public class QuizCard extends Fragment {
         items.add(new ItemModel(R.drawable.dunderbak, "Mr. Dunderbak's Biergarten", "$$", "14929 Bruce B Downs Blvd"));
         items.add(new ItemModel(R.drawable.felicitous, "Felicitous (on 51st)", "$", "11706 N 51st St"));
         items.add(new ItemModel(R.drawable.poke, "U Poke Spot", "$", "5001 E Fowler Ave"));
+        items.add(new ItemModel(R.drawable.columbia, "Columbia", "$$", "801 Water St #1905"));
         items.add(new ItemModel(R.drawable.cazador, "Cazador Grill", "$$", "10918 N 56th St"));
         items.add(new ItemModel(R.drawable.boba, "BOBACUP", "$", "2732 E Fowler Ave"));
         items.add(new ItemModel(R.drawable.babushka, "Babushka's", "$$", "12639 N 56th St"));
         items.add(new ItemModel(R.drawable.jasmine, "Jasmine Thai", "$$", "13248 Dale Mabry Hwy"));
+        items.add(new ItemModel(R.drawable.ulele, "Ulele", "$$$", "1810 N Highland Ave"));
         items.add(new ItemModel(R.drawable.anchor, "The Anchor Bar", "$", "514 N Franklin St"));
         items.add(new ItemModel(R.drawable.queen, "Queen of Sheba", "$$", "11001 N 56th St"));
         items.add(new ItemModel(R.drawable.wood, "Wood Fired Pizza", "$$", "2822 E Bearss Ave"));
+        items.add(new ItemModel(R.drawable.oceanp, "Ocean Prime", "$$$$", "2205 N Westshore BLVD"));
         items.add(new ItemModel(R.drawable.bagel, "Bagels Plus", "$", "2706 E Fletcher Ave"));
         items.add(new ItemModel(R.drawable.bun, "Sweet Buns", "$", "2788 E Fowler Ave"));
         items.add(new ItemModel(R.drawable.hat, "Hattricks", "$$", "107 S Franklin St"));
         items.add(new ItemModel(R.drawable.arm, "Armature Works", "$$", "1910 N Ola Ave"));
         items.add(new ItemModel(R.drawable.love, "Loving Hut", "$", "1905 E Fletcher Ave"));
+        items.add(new ItemModel(R.drawable.pepper, "Sacred Pepper" , "$$$", "15405 N Dale Mabry Hwy"));
 
 
 
