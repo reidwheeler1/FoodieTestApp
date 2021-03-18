@@ -248,7 +248,7 @@ public class QuizCard extends Fragment {
             for(int i = 0; i < 10; i++){
                 String name = jsonArray.getJSONObject(i).getString("name");
                 String price = jsonArray.getJSONObject(i).getString("price");
-                String location = jsonArray.getJSONObject(i).getString("review_count");
+                String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
                 items.add(new ItemModel(image_url,name,price,location));
             }
