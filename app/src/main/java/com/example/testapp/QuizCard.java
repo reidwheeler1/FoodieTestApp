@@ -250,7 +250,7 @@ public class QuizCard extends Fragment {
                 String price = jsonArray.getJSONObject(i).getString("price");
                 String location = jsonArray.getJSONObject(i).getString("review_count");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
-                items.add(new ItemModel(R.drawable.dunderbak,name,price,location));
+                items.add(new ItemModel(image_url,name,price,location));
             }
 
         } catch (JSONException e){

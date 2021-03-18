@@ -1,22 +1,21 @@
 package com.example.testapp;
 
 public class ItemModel {
-    private int image;
-    private String name, location, price_range;
+    private String name, location, price_range, image;
 
     //Set default values if ItemModel called without arguments
     public ItemModel() {
 
     }
 
-    public ItemModel(int image, String name, String location, String price_range) {
+    public ItemModel(String image, String name, String location, String price_range) {
         this.image = image;
         this.name = name;
         this.location = location;
         this.price_range = price_range;
     }
 
-    public int getImage() { return image; }
+    public String getImage() { return image; }
 
     public String getName() { return name; }
 

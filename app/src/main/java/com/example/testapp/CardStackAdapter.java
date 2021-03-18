@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.ViewHolder> {
@@ -49,7 +51,7 @@ public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.View
         }
 
         void setData(ItemModel data) {
-            image.setImageResource(data.getImage());
+            Picasso.get().load(data.getImage()).into(image);
             name.setText(data.getName());
             location.setText(data.getLocation());
             price_range.setText(data.getPrice_range());
