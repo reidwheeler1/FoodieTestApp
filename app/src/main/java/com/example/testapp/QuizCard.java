@@ -21,8 +21,18 @@ import com.yuyakaido.android.cardstackview.Direction;
 import com.yuyakaido.android.cardstackview.StackFrom;
 import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +44,9 @@ public class QuizCard extends Fragment {
     private static final String TAG = QuizCard.class.getSimpleName();
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
+
+    // Okhttp Client
+    private final OkHttpClient client = new OkHttpClient();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -177,42 +190,71 @@ public class QuizCard extends Fragment {
     }
 
     private List<ItemModel> addList() {
+        Log.i("addList()","Calling addList");
         List<ItemModel> items = new ArrayList<>();
         //Add items here
 
-        addPrototypeItems(items);
+        String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
+        //      Searches businesses with location query of zip code 33620 (USF Zip)
+        String url = "https://api.yelp.com/v3/businesses/search?location=33620";
+        final String[] jsonResponse = new String[1];
+        Thread t =  new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization","Bearer " + yelpAPIKey)
+                        .build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                    Headers responseHeaders = response.headers();
+                    for (int i = 0; i < responseHeaders.size(); i++) {
+                        System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+                    }
+                    //Log.i("TEST",response.body().string());
+
+                    jsonResponse[0] = response.body().string();
+                    Log.i("TEST",jsonResponse[0]);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        t.start();
+
+        try {
+            t.join();
+        } catch (Exception e){
+            Log.e("ERROR",e.toString());
+        }
+
+        addPrototypeItems(jsonResponse[0],items);
         return items;
     }
 
     //Only intended for use with the prototype app
-    private void addPrototypeItems(List<ItemModel> items) {
-        items.add(new ItemModel(R.drawable.berns, "Bern's Steak House", "$$$$", "1208 S Howard Ave"));
-        items.add(new ItemModel(R.drawable.dunderbak, "Mr. Dunderbak's Biergarten", "$$", "14929 Bruce B Downs Blvd"));
-        items.add(new ItemModel(R.drawable.felicitous, "Felicitous (on 51st)", "$", "11706 N 51st St"));
-        items.add(new ItemModel(R.drawable.poke, "U Poke Spot", "$", "5001 E Fowler Ave"));
-        items.add(new ItemModel(R.drawable.columbia, "Columbia", "$$", "801 Water St #1905"));
-        items.add(new ItemModel(R.drawable.cazador, "Cazador Grill", "$$", "10918 N 56th St"));
-        items.add(new ItemModel(R.drawable.boba, "BOBACUP", "$", "2732 E Fowler Ave"));
-        items.add(new ItemModel(R.drawable.babushka, "Babushka's", "$$", "12639 N 56th St"));
-        items.add(new ItemModel(R.drawable.jasmine, "Jasmine Thai", "$$", "13248 Dale Mabry Hwy"));
-        items.add(new ItemModel(R.drawable.ulele, "Ulele", "$$$", "1810 N Highland Ave"));
-        items.add(new ItemModel(R.drawable.anchor, "The Anchor Bar", "$", "514 N Franklin St"));
-        items.add(new ItemModel(R.drawable.queen, "Queen of Sheba", "$$", "11001 N 56th St"));
-        items.add(new ItemModel(R.drawable.wood, "Wood Fired Pizza", "$$", "2822 E Bearss Ave"));
-        items.add(new ItemModel(R.drawable.oceanp, "Ocean Prime", "$$$$", "2205 N Westshore BLVD"));
-        items.add(new ItemModel(R.drawable.bagel, "Bagels Plus", "$", "2706 E Fletcher Ave"));
-        items.add(new ItemModel(R.drawable.bun, "Sweet Buns", "$", "2788 E Fowler Ave"));
-        items.add(new ItemModel(R.drawable.hat, "Hattricks", "$$", "107 S Franklin St"));
-        items.add(new ItemModel(R.drawable.arm, "Armature Works", "$$", "1910 N Ola Ave"));
-        items.add(new ItemModel(R.drawable.love, "Loving Hut", "$", "1905 E Fletcher Ave"));
-        items.add(new ItemModel(R.drawable.pepper, "Sacred Pepper" , "$$$", "15405 N Dale Mabry Hwy"));
+    private void addPrototypeItems(String jsonResponse, List<ItemModel> items) {
+        Log.i("addPrototypeItems","Calling Prototype Items");
+        try {
+            Log.i("addPrototypeItems - RESPONSE",jsonResponse);
+            JSONObject response = new JSONObject(jsonResponse);
+            JSONArray jsonArray = response.getJSONArray("businesses");
 
 
+            for(int i = 0; i < 10; i++){
+                String name = jsonArray.getJSONObject(i).getString("name");
+                String price = jsonArray.getJSONObject(i).getString("price");
+                String location = jsonArray.getJSONObject(i).getString("review_count");
+                String image_url = jsonArray.getJSONObject(i).getString("image_url");
+                items.add(new ItemModel(R.drawable.dunderbak,name,price,location));
+            }
 
-        items.add(new ItemModel(R.drawable.berns, "Bern's Steak House", "$$$$", "1208 S Howard Ave"));
-        items.add(new ItemModel(R.drawable.jasmine, "Jasmine Thai", "$$", "13248 Dale Mabry Hwy"));
-        items.add(new ItemModel(R.drawable.anchor, "The Anchor Bar", "$", "514 N Franklin St"));
-
-        return;
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 }
