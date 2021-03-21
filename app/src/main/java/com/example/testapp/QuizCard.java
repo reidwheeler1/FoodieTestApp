@@ -102,12 +102,12 @@ public class QuizCard extends Fragment {
         manager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
             public void onCardDragging(Direction direction, float ratio) {
-                Log.d(TAG, "onCardDragging: d=" + direction.name() + " ratio=" + ratio);
+                //Log.d(TAG, "onCardDragging: d=" + direction.name() + " ratio=" + ratio);
             }
 
             @Override
             public void onCardSwiped(Direction direction) {
-                Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
+                Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
                 //Toasts display the message at the bottom of the screen, but linger around too long for this purpose
 /*                if (direction == Direction.Right) {
                     Toast.makeText(getContext(), "Direction Right", Toast.LENGTH_SHORT).show();
@@ -122,9 +122,11 @@ public class QuizCard extends Fragment {
                     Toast.makeText(getContext(), "Direction Bottom", Toast.LENGTH_SHORT).show();
                 }*/
 
-                //If getItemCount - <number> == 0, paginate card stack
+                //If getTopPosition == original item count, paginate card stack
                 //TODO: Look into changing this logic (potential for errors)
-                if (manager.getTopPosition() == adapter.getItemCount() - 3) {
+                //Can optionally choose not to paginate; instead, lock card movement with
+                //prompt to reset by tapping suggestions on the bottom nav bar
+                if (manager.getTopPosition() == adapter.getItemCount()) {
                     paginate(); //Paginating: see function definition below
                 }
             }
@@ -152,9 +154,9 @@ public class QuizCard extends Fragment {
             }
         });
         //Modify carding swiping UX here:
-        manager.setStackFrom(StackFrom.None);
-        manager.setVisibleCount(2);
-        manager.setTranslationInterval(8.0f);
+        manager.setStackFrom(StackFrom.Top);
+        manager.setVisibleCount(3);
+        manager.setTranslationInterval(4.0f);
         manager.setScaleInterval(0.95f);
         manager.setSwipeThreshold(0.3f);
         manager.setMaxDegree(20.0f);
@@ -163,10 +165,6 @@ public class QuizCard extends Fragment {
         manager.setCanScrollHorizontal(true); //Enables card to move on horizontal axis
         //manager.setCanScrollVertical(true); //Enables card to move on vertical axis, regardless of set Direction
 
-        // Adding Stackable Cards
-        manager.setStackFrom(StackFrom.Top);
-        manager.setVisibleCount(3);
-        manager.setTranslationInterval(4.0f);
 
         //SwipeableMethod determines whether buttons are used (Automatic) or touch-and-drag (Manual)
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
