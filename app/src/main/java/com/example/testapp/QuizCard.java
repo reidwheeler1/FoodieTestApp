@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.content.ClipData;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -26,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,7 @@ public class QuizCard extends Fragment {
     private static final String TAG = QuizCard.class.getSimpleName();
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
+    private List<ItemModel> itemModelReference;
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
@@ -170,7 +173,7 @@ public class QuizCard extends Fragment {
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
 
         manager.setOverlayInterpolator(new LinearInterpolator());
-        adapter = new CardStackAdapter(addList());
+        adapter = new CardStackAdapter(addPreferenceList());
         cardStackView.setLayoutManager(manager);
         cardStackView.setAdapter(adapter);
         cardStackView.setItemAnimator(new DefaultItemAnimator());
@@ -185,6 +188,22 @@ public class QuizCard extends Fragment {
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
         adapter.setItems(new_items);
         result.dispatchUpdatesTo(adapter);
+    }
+
+    /*Creates a list of 5 preference options used to customize restaurant search*/
+    private List<ItemModel> addPreferenceList() {
+        itemModelReference = new ArrayList<>();
+        itemModelReference.add(new ItemModel(
+                "https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
+                "Chicken", "", "", "chicken_wings"));
+        itemModelReference.add(new ItemModel(
+                "https://images.unsplash.com/photo-1565299715199-866c917206bb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=714&q=80",
+                "Steak", "", "", "steak"));
+        itemModelReference.add(new ItemModel(
+                "https://images.unsplash.com/photo-1587841424505-4205a6e73ef7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+                "Burgers", "", "", "burgers"));
+
+        return itemModelReference;
     }
 
     private List<ItemModel> addList() {
