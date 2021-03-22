@@ -192,11 +192,16 @@ public class QuizCard extends Fragment {
     private List<ItemModel> addList() {
         Log.i("addList()","Calling addList");
         List<ItemModel> items = new ArrayList<>();
+        String url ="https://api.yelp.com/v3/businesses/search?location=" + MainActivity.zipcode;
         //Add items here
-
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
         //      Searches businesses with location query of zip code 33620 (USF Zip)
-        String url = "https://api.yelp.com/v3/businesses/search?location=33620";
+     //   if (MainActivity.zipcode != null) {
+     //       url = "https://api.yelp.com/v3/businesses/search?location=" + MainActivity.zipcode;
+     //   }else
+     //   {
+     //       url = "https://api.yelp.com/v3/businesses/search?location=33617";
+     //   }
         final String[] jsonResponse = new String[1];
         Thread t =  new Thread(new Runnable() {
             @Override
@@ -245,7 +250,7 @@ public class QuizCard extends Fragment {
             JSONArray jsonArray = response.getJSONArray("businesses");
 
 
-            for(int i = 0; i < 10; i++){
+            for(int i = 0; i < jsonArray.length(); i++){
                 String name = jsonArray.getJSONObject(i).getString("name");
                 String price = jsonArray.getJSONObject(i).getString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
