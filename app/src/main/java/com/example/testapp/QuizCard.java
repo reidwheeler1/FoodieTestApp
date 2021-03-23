@@ -47,6 +47,9 @@ public class QuizCard extends Fragment {
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
     private List<ItemModel> itemModelReference;
+    //
+    private boolean gatheringPreferences = true; //Set to false in onCardSwiped() if paginating
+    private List<ItemModel> likedPreferences;
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
@@ -102,6 +105,7 @@ public class QuizCard extends Fragment {
 
     private void init(View root) {
         CardStackView cardStackView = root.findViewById(R.id.card_stack_view);
+        likedPreferences = new ArrayList<>();
         manager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
             public void onCardDragging(Direction direction, float ratio) {
@@ -111,25 +115,16 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
-                //Toasts display the message at the bottom of the screen, but linger around too long for this purpose
-/*                if (direction == Direction.Right) {
-                    Toast.makeText(getContext(), "Direction Right", Toast.LENGTH_SHORT).show();
+                //TODO: change logic to accommodate both preference list and suggestion list (referring to "< 3" logic)
+                if (direction == Direction.Right && gatheringPreferences) {
+                    likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
                 }
-                if (direction == Direction.Left) {
-                    Toast.makeText(getContext(), "Direction Left", Toast.LENGTH_SHORT).show();
-                }
-                if (direction == Direction.Top) {
-                    Toast.makeText(getContext(), "Direction Top", Toast.LENGTH_SHORT).show();
-                }
-                if (direction == Direction.Bottom) {
-                    Toast.makeText(getContext(), "Direction Bottom", Toast.LENGTH_SHORT).show();
-                }*/
 
                 //If getTopPosition == original item count, paginate card stack
-                //TODO: Look into changing this logic (potential for errors)
                 //Can optionally choose not to paginate; instead, lock card movement with
                 //prompt to reset by tapping suggestions on the bottom nav bar
                 if (manager.getTopPosition() == adapter.getItemCount()) {
+                    gatheringPreferences = false;
                     paginate(); //Paginating: see function definition below
                 }
             }
@@ -206,6 +201,14 @@ public class QuizCard extends Fragment {
         return itemModelReference;
     }
 
+    private String constructURL() {
+        String url = "&categories=";
+        url = url + likedPreferences.get(0).getIdentifier();
+        for (int i=1; i < likedPreferences.size(); i++)
+            url = url + "," + likedPreferences.get(i).getIdentifier();
+        return url;
+    }
+
     private List<ItemModel> addList() {
         Log.i("addList()","Calling addList");
         List<ItemModel> items = new ArrayList<>();
@@ -213,7 +216,8 @@ public class QuizCard extends Fragment {
 
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
         //      Searches businesses with location query of zip code 33620 (USF Zip)
-        String url = "https://api.yelp.com/v3/businesses/search?location=33620";
+        String url = "https://api.yelp.com/v3/businesses/search?location=33620" + constructURL();
+        Log.i("addList()", url);
         final String[] jsonResponse = new String[1];
         Thread t =  new Thread(new Runnable() {
             @Override
@@ -264,7 +268,7 @@ public class QuizCard extends Fragment {
 
             for(int i = 0; i < 10; i++){
                 String name = jsonArray.getJSONObject(i).getString("name");
-                String price = jsonArray.getJSONObject(i).getString("price");
+                String price = jsonArray.getJSONObject(i).optString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
                 items.add(new ItemModel(image_url,name,price,location));
