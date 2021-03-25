@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,7 @@ import okhttp3.Response;
 public class QuizCard extends Fragment {
 
     private static final String TAG = QuizCard.class.getSimpleName();
+    private RelativeLayout progressBar;
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
     private List<ItemModel> itemModelReference;
@@ -99,6 +102,8 @@ public class QuizCard extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_quiz_card, container, false);
+        //TODO: Add visibility calls after altering thread logic
+        progressBar = root.findViewById(R.id.loadingPanel);
         init(root);
         return root;
     }
