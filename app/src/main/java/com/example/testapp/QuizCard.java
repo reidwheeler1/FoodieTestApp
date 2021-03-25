@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DiffUtil;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +104,6 @@ public class QuizCard extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_quiz_card, container, false);
-        //TODO: Add visibility calls after altering thread logic
         progressBar = root.findViewById(R.id.loadingPanel);
         init(root);
         return root;
@@ -120,7 +121,6 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
-                //TODO: change logic to accommodate both preference list and suggestion list (referring to "< 3" logic)
                 if (direction == Direction.Right && gatheringPreferences) {
                     likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
                 }
@@ -181,13 +181,28 @@ public class QuizCard extends Fragment {
 
     //When current card stack is near end, integrate new items into stack
     private void paginate() {
-        //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
-        List<ItemModel> old_items = adapter.getItems();
-        List<ItemModel> new_items = new ArrayList<>(addList());
-        CardStackCallback callback = new CardStackCallback(old_items, new_items);
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-        adapter.setItems(new_items);
-        result.dispatchUpdatesTo(adapter);
+        //Start spinner
+        progressBar.setVisibility(View.VISIBLE);
+        //new thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
+                List<ItemModel> old_items = adapter.getItems();
+                List<ItemModel> new_items = new ArrayList<>(addList());
+                CardStackCallback callback = new CardStackCallback(old_items, new_items);
+                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
+                adapter.setItems(new_items);
+                //run below on UI thread
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                   @Override
+                   public void run() {
+                       result.dispatchUpdatesTo(adapter);
+                       progressBar.setVisibility(View.GONE);
+                   }
+                });
+            }
+        }).start();
     }
 
     /*Creates a list of 5 preference options used to customize restaurant search*/
@@ -224,9 +239,9 @@ public class QuizCard extends Fragment {
         String url = "https://api.yelp.com/v3/businesses/search?location=33620" + constructURL();
         Log.i("addList()", url);
         final String[] jsonResponse = new String[1];
-        Thread t =  new Thread(new Runnable() {
-            @Override
-            public void run() {
+//        Thread t =  new Thread(new Runnable() {
+//            @Override
+//            public void run() {
                 Request request = new Request.Builder()
                         .url(url)
                         .header("Authorization","Bearer " + yelpAPIKey)
@@ -247,16 +262,16 @@ public class QuizCard extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-        });
+//            }
+//        });
 
-        t.start();
-
-        try {
-            t.join();
-        } catch (Exception e){
-            Log.e("ERROR",e.toString());
-        }
+//        t.start();
+//
+//        try {
+//            t.join();
+//        } catch (Exception e){
+//            Log.e("ERROR",e.toString());
+//        }
 
         addPrototypeItems(jsonResponse[0],items);
         return items;
