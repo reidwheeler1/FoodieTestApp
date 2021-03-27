@@ -158,6 +158,7 @@ public class QuizCard extends Fragment {
                 Log.d(TAG, "onCardAppeared: " + position + ", name: " + textView.getText());
             }
         });
+
         //Modify carding swiping UX here:
         manager.setStackFrom(StackFrom.None);
         manager.setVisibleCount(2);
@@ -197,7 +198,6 @@ public class QuizCard extends Fragment {
     }
 
     private List<ItemModel> addList() {
-        Log.i("addList()", "Calling addList");
         List<ItemModel> items = new ArrayList<>();
         //Add items here
 
@@ -259,12 +259,13 @@ public class QuizCard extends Fragment {
             JSONArray jsonArray = response.getJSONArray("businesses");
 
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                String id = jsonArray.getJSONObject(i).getString("id");
                 String name = jsonArray.getJSONObject(i).getString("name");
                 String price = jsonArray.getJSONObject(i).getString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
-                items.add(new ItemModel(image_url, name, price, location));
+                items.add(new ItemModel(image_url, name, price, location,id));
             }
 
         } catch (JSONException e) {
@@ -272,6 +273,7 @@ public class QuizCard extends Fragment {
         }
     }
 
-
-
+    public void clicker(View v){
+        Log.d(TAG, "clicker: IVE BEEN CLICKED :D");
+    }
 }
