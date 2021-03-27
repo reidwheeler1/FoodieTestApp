@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("mylog from main", String.valueOf(MainActivity.postalcode));
 
         getIntent().getAction().equals("ACT_LOC");
-
-
+        Thread t =  new Thread(new Runnable() {
+                      @Override
+           public void run() {
         setContentView(R.layout.activity_main);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_nav_bar);
@@ -61,7 +62,17 @@ public class MainActivity extends AppCompatActivity {
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container_view, QuizCard.class, null)
                     .commit();
-        }
+        }   }
+       });
+
+        t.start();
+
+        try {
+           t.join();
+       } catch (Exception e){
+           Log.e("ERROR",e.toString());
+       }
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -94,6 +105,7 @@ GPS functions
     void startService(){
 
         LocationBroadcastReciever reciever = new LocationBroadcastReciever();
+        reciever.goAsync();
         IntentFilter filter = new IntentFilter("ACT_LOC");
         registerReceiver(reciever,filter);
         Intent intent = new Intent(MainActivity.this, GPS.class);
@@ -124,6 +136,7 @@ GPS functions
                 double longitude = intent.getDoubleExtra("longitude", 0f);
                 postalcode = intent.getStringExtra("postalcode");
                 Toast.makeText(MainActivity.this, "Lat: " + latitude + ", longi is: " + longitude + " postalcode: " + postalcode, Toast.LENGTH_LONG).show();
+
             }
 
 
