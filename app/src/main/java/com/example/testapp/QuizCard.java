@@ -124,6 +124,10 @@ public class QuizCard extends Fragment {
                 if (direction == Direction.Right && gatheringPreferences) {
                     likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
                 }
+                if (direction == Direction.Right && !gatheringPreferences) {
+                    //likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
+                    MainActivity.likes += itemToString(adapter.getItems().get(manager.getTopPosition()-1));
+                }
 
                 //If getTopPosition == original item count, paginate card stack
                 //Can optionally choose not to paginate; instead, lock card movement with
@@ -291,11 +295,27 @@ public class QuizCard extends Fragment {
                 String price = jsonArray.getJSONObject(i).optString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
-                items.add(new ItemModel(image_url,name,price,location));
+                String id = jsonArray.getJSONObject(i).getString("id");
+                items.add(new ItemModel(image_url,name,price,location,id));
             }
 
         } catch (JSONException e){
             e.printStackTrace();
         }
     }
+
+
+    private String itemToString (ItemModel item){
+        String itemString = "";
+        itemString = itemString + "," + item.getName();
+        itemString = itemString + "," + item.getPrice_range();
+        itemString = itemString + "," + item.getLocation();
+        itemString = itemString + "," + item.getImage();
+        itemString = itemString + "," + item.getIdentifier() + "\n";
+
+        return itemString;
+    }
+
+
+
 }
