@@ -281,6 +281,7 @@ public class QuizCard extends Fragment {
         return items;
     }
 
+
     //Only intended for use with the prototype app
     private void addPrototypeItems(String jsonResponse, List<ItemModel> items) {
         Log.i("addPrototypeItems","Calling Prototype Items");
