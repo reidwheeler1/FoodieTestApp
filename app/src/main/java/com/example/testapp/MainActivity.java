@@ -20,7 +20,7 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
     public static String filename = "CSV_likes";
-    public static String likes;
+    public static String likes = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

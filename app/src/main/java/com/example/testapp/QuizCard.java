@@ -306,8 +306,7 @@ public class QuizCard extends Fragment {
 
 
     private String itemToString (ItemModel item){
-        String itemString = "";
-        itemString = itemString + item.getName();
+        String itemString = item.getName();
         itemString = itemString + "," + item.getPrice_range();
         itemString = itemString + "," + item.getLocation();
         itemString = itemString + "," + item.getImage();
