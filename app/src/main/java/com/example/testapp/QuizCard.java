@@ -306,10 +306,21 @@ public class QuizCard extends Fragment {
 
 
     private String itemToString (ItemModel item){
-        String itemString = item.getName();
-        itemString = itemString + "," + item.getPrice_range();
+        for (int i=0; i<MainActivity.items.size(); i++){
+            if( MainActivity.items.get(i).getIdentifier().equals(item.getIdentifier())){
+                Log.i("mylog","this item: " + item.getName() +" has already been added tf!");
+                return "";
+            }
+        }
+
+
+
+
+
+        String itemString = item.getImage();
+        itemString = itemString + "," + item.getName();
         itemString = itemString + "," + item.getLocation();
-        itemString = itemString + "," + item.getImage();
+        itemString = itemString + "," + item.getPrice_range();
         itemString = itemString + "," + item.getIdentifier() + "\n";
 
         return itemString;

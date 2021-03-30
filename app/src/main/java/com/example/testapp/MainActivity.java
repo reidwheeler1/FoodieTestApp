@@ -16,11 +16,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
     public static String filename = "CSV_likes";
     public static String likes = "";
+    public static List<ItemModel> items = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        try {
+            readLikes();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -54,11 +68,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            readLikes();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -84,16 +94,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
+// create file if it doesn't exist
     private void startSavingLikes(){
-       // File directory;
-       // directory = getFilesDir();
-       // File[] files = directory.listFiles();
         File filePref = new File(getFilesDir(), filename);
 
 
     }
-
+// likes store in a CSV with each Item model parameter in the order of assignment in the oobject class
     public void writeLikes() throws IOException {
 
         FileOutputStream fos = openFileOutput(filename, Context.MODE_APPEND);
@@ -110,15 +117,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+//read in likes file if it exists and load them into project
     private void readLikes() throws FileNotFoundException {
         FileInputStream fis = openFileInput(filename);
+        String[] itemContent;
         Scanner scanner = new Scanner(fis);
         while (scanner.hasNextLine()) {
             String content = scanner.nextLine();
-            Log.i("mylog","file content: " + content);
+
+            itemContent = content.split(",");
+            itemContent[4] = itemContent[4].trim();
+            ItemModel itemModel = new ItemModel(itemContent[0],itemContent[1],itemContent[2],itemContent[3],itemContent[4]);
+            items.add(itemModel);
+            Log.i("mylog","file content: " + items.get(items.size()-1).getName());
+
+
         }
-        //scanner.useDelimiter(",");
+        //
         //String content = scanner.next();
 
         scanner.close();
