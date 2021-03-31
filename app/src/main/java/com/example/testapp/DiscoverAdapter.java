@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -36,27 +38,25 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.setData(restaurants.get(position));
-        //Log.i("DISCOVER ADAPTER SET DATA", restaurants.get(position).getImage());
-        //Picasso.get().load(restaurants.get(position).getImage()).into(holder.gridImage);
 
         // Setting CLick Listener on Card View
-//        holder.image.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                // Launches Restaurant Info Activity
-//                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-//                // Passing item view Model into restaurant info view model
-//                RestaurantInfoViewModel resViewModel = new RestaurantInfoViewModel(restaurants.get(position));
-//                // Passing view RestaurantInfoViewModel into fragment
-//                Fragment resInfo = new RestaurantInfo(resViewModel);
-//                // Replacing view model with new fragment
-//                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view,resInfo).addToBackStack(null).commit();
-//                Log.i("DISCOVER", "onClick: CLICKED");
-//
-//            }
-//        });
+        holder.gridImage.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // Launches Restaurant Info Activity
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                // Passing item view Model into restaurant info view model
+                RestaurantInfoViewModel resViewModel = new RestaurantInfoViewModel(restaurants.get(position));
+                // Passing view RestaurantInfoViewModel into fragment
+                Fragment resInfo = new RestaurantInfo(resViewModel);
+                // Replacing view model with new fragment
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view,resInfo).addToBackStack(null).commit();
+                Log.i("DISCOVER", "onClick: CLICKED");
+
+            }
+        });
     }
 
     @Override
