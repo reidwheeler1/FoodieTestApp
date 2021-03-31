@@ -131,11 +131,16 @@ public class QuizCard extends Fragment {
                 if (direction == Direction.Right && gatheringPreferences) {
                     likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
                 }
+                if (direction == Direction.Right && !gatheringPreferences) {
+                    //likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
+                    MainActivity.likes += itemToString(adapter.getItems().get(manager.getTopPosition()-1));
+                }
 
                 //If getTopPosition == original item count, paginate card stack
                 //Can optionally choose not to paginate; instead, lock card movement with
                 //prompt to reset by tapping suggestions on the bottom nav bar
                 if (manager.getTopPosition() == adapter.getItemCount()) {
+
                     gatheringPreferences = false;
                     paginate(); //Paginating: see function definition below
                 }
@@ -163,7 +168,6 @@ public class QuizCard extends Fragment {
                 Log.d(TAG, "onCardAppeared: " + position + ", name: " + textView.getText());
             }
         });
-
         //Modify carding swiping UX here:
         manager.setStackFrom(StackFrom.Top);
         manager.setVisibleCount(3);
@@ -243,20 +247,17 @@ public class QuizCard extends Fragment {
 
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
         //      Searches businesses with location query of zip code 33620 (USF Zip)
-        String url = "https://api.yelp.com/v3/businesses/search?location=33620" + constructURL();
+        String url = "https://api.yelp.com/v3/businesses/search?location=" + MainActivity.getPostalcode() + constructURL();
         Log.i("addList()", url);
         final String[] jsonResponse = new String[1];
-//        Thread t =  new Thread(new Runnable() {
-//            @Override
-//            public void run() {
+
                 Request request = new Request.Builder()
                         .url(url)
                         .header("Authorization", "Bearer " + yelpAPIKey)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
-                    if (!response.isSuccessful())
-                        throw new IOException("Unexpected code " + response);
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
                     Headers responseHeaders = response.headers();
                     for (int i = 0; i < responseHeaders.size(); i++) {
@@ -270,20 +271,9 @@ public class QuizCard extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//            }
-//        });
-
-//        t.start();
-//
-//        try {
-//            t.join();
-//        } catch (Exception e){
-//            Log.e("ERROR",e.toString());
-//        }
 
         addPrototypeItems(jsonResponse[0], items);
         return items;
-
     }
 
     //Only intended for use with the prototype app
@@ -296,20 +286,36 @@ public class QuizCard extends Fragment {
 
 
             for (int i = 0; i < jsonArray.length(); i++) {
-                String id = jsonArray.getJSONObject(i).getString("id");
                 String name = jsonArray.getJSONObject(i).getString("name");
                 String price = jsonArray.getJSONObject(i).optString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
-                items.add(new ItemModel(image_url, name, price, location,id));
+                String id = jsonArray.getJSONObject(i).getString("id");
+                items.add(new ItemModel(image_url,name,price,location,id));
             }
 
-        } catch (JSONException e) {
+        } catch (JSONException e){
             e.printStackTrace();
         }
     }
 
     public void clicker(View v){
         Log.d(TAG, "clicker: IVE BEEN CLICKED :D");
+    }
+
+
+    private String itemToString (ItemModel item) {
+        for (int i = 0; i < MainActivity.items.size(); i++) {
+            if (MainActivity.items.get(i).getIdentifier().equals(item.getIdentifier())) {
+                return "";
+            }
+        }
+
+        String additem = item.getImage();
+        additem += "," + item.getName();
+        additem += "," + item.getLocation();
+        additem += "," + item.getPrice_range();
+        additem += "," + item.getIdentifier() + "\n";
+        return additem;
     }
 }

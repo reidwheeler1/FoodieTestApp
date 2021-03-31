@@ -6,6 +6,7 @@ public class ItemModel {
     //Set default values if ItemModel called without arguments
     public ItemModel() {
 
+
     }
 
     public ItemModel(String image, String name, String price_range, String location) {
