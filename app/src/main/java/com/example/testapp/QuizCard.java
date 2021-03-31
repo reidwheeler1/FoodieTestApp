@@ -309,7 +309,6 @@ public class QuizCard extends Fragment {
     private String itemToString (ItemModel item){
         for (int i=0; i<MainActivity.items.size(); i++){
             if( MainActivity.items.get(i).getIdentifier().equals(item.getIdentifier())){
-                Log.i("mylog","this item: " + item.getName() +" has already been added tf!");
                 return "";
             }
         }
