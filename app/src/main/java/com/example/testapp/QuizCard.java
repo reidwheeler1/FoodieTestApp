@@ -1,6 +1,10 @@
 package com.example.testapp;
 
 import android.content.ClipData;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -67,6 +71,9 @@ public class QuizCard extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    //GPS variables
+    static String postalcode;
 
     public QuizCard() {
         super(R.layout.fragment_quiz_card);
@@ -234,7 +241,6 @@ public class QuizCard extends Fragment {
     }
 
     private List<ItemModel> addList() {
-        Log.i("addList()","Calling addList");
         List<ItemModel> items = new ArrayList<>();
         //Add items here
 
@@ -248,7 +254,7 @@ public class QuizCard extends Fragment {
 //            public void run() {
                 Request request = new Request.Builder()
                         .url(url)
-                        .header("Authorization","Bearer " + yelpAPIKey)
+                        .header("Authorization", "Bearer " + yelpAPIKey)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
@@ -261,7 +267,7 @@ public class QuizCard extends Fragment {
                     //Log.i("TEST",response.body().string());
 
                     jsonResponse[0] = response.body().string();
-                    Log.i("TEST",jsonResponse[0]);
+                    Log.i("TEST", jsonResponse[0]);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -277,21 +283,21 @@ public class QuizCard extends Fragment {
 //            Log.e("ERROR",e.toString());
 //        }
 
-        addPrototypeItems(jsonResponse[0],items);
+        addPrototypeItems(jsonResponse[0], items);
         return items;
     }
 
-
     //Only intended for use with the prototype app
     private void addPrototypeItems(String jsonResponse, List<ItemModel> items) {
-        Log.i("addPrototypeItems","Calling Prototype Items");
+        Log.i("addPrototypeItems", "Calling Prototype Items");
         try {
-            Log.i("addPrototypeItems - RESPONSE",jsonResponse);
+            Log.i("addPrototypeItems - RESPONSE", jsonResponse);
             JSONObject response = new JSONObject(jsonResponse);
             JSONArray jsonArray = response.getJSONArray("businesses");
 
 
-            for(int i = 0; i < 10; i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
+                String id = jsonArray.getJSONObject(i).getString("id");
                 String name = jsonArray.getJSONObject(i).getString("name");
                 String price = jsonArray.getJSONObject(i).optString("price");
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
@@ -305,6 +311,10 @@ public class QuizCard extends Fragment {
         }
     }
 
+    public void clicker(View v){
+        Log.d(TAG, "clicker: IVE BEEN CLICKED :D");
+    }
+
 
     private String itemToString (ItemModel item){
         for (int i=0; i<MainActivity.items.size(); i++){
@@ -312,20 +322,4 @@ public class QuizCard extends Fragment {
                 return "";
             }
         }
-
-
-
-
-
-        String itemString = item.getImage();
-        itemString = itemString + "," + item.getName();
-        itemString = itemString + "," + item.getLocation();
-        itemString = itemString + "," + item.getPrice_range();
-        itemString = itemString + "," + item.getIdentifier() + "\n";
-
-        return itemString;
-    }
-
-
-
 }
