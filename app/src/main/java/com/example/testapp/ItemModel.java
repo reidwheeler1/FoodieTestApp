@@ -8,7 +8,7 @@ public class ItemModel {
 
     }
 
-    public ItemModel(String image, String name, String location, String price_range) {
+    public ItemModel(String image, String name, String price_range, String location) {
         this.image = image;
         this.name = name;
         this.location = location;
