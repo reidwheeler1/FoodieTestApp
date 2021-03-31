@@ -2,11 +2,7 @@ package com.example.testapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import okhttp3.Headers;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -14,14 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;

@@ -299,9 +299,6 @@ public class QuizCard extends Fragment {
         }
     }
 
-    public void clicker(View v){
-        Log.d(TAG, "clicker: IVE BEEN CLICKED :D");
-    }
 
 
     private String itemToString (ItemModel item) {
