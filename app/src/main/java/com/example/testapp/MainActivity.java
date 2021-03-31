@@ -53,10 +53,21 @@ public class MainActivity extends AppCompatActivity {
 
 
         //GPS check permissions
+
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // request permission
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(MainActivity.this, "This app will not work without location!", Toast.LENGTH_LONG).show();
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                        startService();
+                    }
+                }
+                else {
+                    startService();
+                }
             } else {
                 //req location permission
                 startService();
@@ -67,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             startService();
         }
 
-
+        locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Log.d("mylog from main", String.valueOf(MainActivity.postalcode));
 
         getIntent().getAction().equals("ACT_LOC");
