@@ -45,37 +45,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        boolean network_enabled = locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        Location location;
-
-        if (network_enabled) {
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            if(location!=null){
-
-               double longitude = location.getLongitude();
-                double latitude = location.getLatitude();
-
-
-
-               Toast.makeText(MainActivity.this, "Lat: " + latitude + ", longi is: " + longitude + " postalcode: " + postalcode, Toast.LENGTH_LONG).show();
-            }
-        }
-
         //GPS check permissions
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -104,12 +73,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
                 if (savedInstanceState == null) {
-                    /*If fragment requires some initial data, arguments can be passed to fragment
-                     * by providing a Bundle in the call to FragmentTransaction.add(), as shown below
-                     * https://developer.android.com/guide/fragments/create */
-                    /*Bundle bundle = new Bundle();
-                     * bundle.putInt("some_int", 0);
-                     * //Then, replace 'null' final argument of .add(...) with 'bundle'*/
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fragment_container_view, ProfileFragment.class, null)
@@ -212,6 +175,10 @@ GPS functions
         return postalcode;
     }
 
+
+    /*
+    save likes
+     */
     // create file if it doesn't exist
     private void startSavingLikes(){
         File filePref = new File(getFilesDir(), filename);
