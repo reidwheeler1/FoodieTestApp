@@ -53,7 +53,7 @@ public class RestaurantInfoViewModel extends ViewModel {
 
     private void getMoreInfo(ItemModel restaurant){
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
-        String url = "https://api.yelp.com/v3/businesses/"+restaurant.getId();
+        String url = "https://api.yelp.com/v3/businesses/"+restaurant.getIdentifier();
         final String[] jsonResponse = new String[1];
         Thread t = new Thread(new Runnable() {
             @Override

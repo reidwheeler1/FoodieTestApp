@@ -1,7 +1,9 @@
 package com.example.testapp;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.IBinder;
@@ -17,6 +19,8 @@ import com.google.android.gms.location.LocationServices;
 import java.io.IOException;
 import java.util.List;
 
+import androidx.core.app.ActivityCompat;
+
 public class GPS extends Service {
     Geocoder geocoder;
     String postalcode;
@@ -25,32 +29,32 @@ public class GPS extends Service {
     LocationCallback locationCallback;
 
     @Override
-    public IBinder onBind(Intent intent){
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        locationCallback = new LocationCallback(){
+        locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(LocationResult locationResult){
+            public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                Log.d("mylog","Lat is: "+locationResult.getLastLocation().getLatitude() + " , " + "Lng is: " +
+                Log.d("mylog", "Lat is: " + locationResult.getLastLocation().getLatitude() + " , " + "Lng is: " +
                         locationResult.getLastLocation().getLongitude());
                 try {
-                    addresses = geocoder.getFromLocation(locationResult.getLastLocation().getLatitude() , locationResult.getLastLocation().getLongitude() ,1);
+                    addresses = geocoder.getFromLocation(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude(), 1);
                     postalcode = addresses.get(0).getPostalCode();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 Intent intent = new Intent("ACT_LOC");
-                intent.putExtra("latitude",locationResult.getLastLocation().getLatitude());
-                intent.putExtra("longitude",locationResult.getLastLocation().getLongitude());
-                intent.putExtra("postalcode",postalcode);
+                intent.putExtra("latitude", locationResult.getLastLocation().getLatitude());
+                intent.putExtra("longitude", locationResult.getLastLocation().getLongitude());
+                intent.putExtra("postalcode", postalcode);
                 sendBroadcast(intent);
             }
         };
@@ -60,16 +64,21 @@ public class GPS extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
+    public int onStartCommand(Intent intent, int flags, int startId) {
         requestLocation();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void requestLocation(){
+    private void requestLocation() {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.myLooper());
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
 }
