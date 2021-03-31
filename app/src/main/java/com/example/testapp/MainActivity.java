@@ -47,10 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
          LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-     //   boolean network_enabled = locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-     //   Location location;
-
 
         //GPS check permissions
 
@@ -182,7 +178,7 @@ GPS functions
                 double latitude = intent.getDoubleExtra("latitude", 0f);
                 double longitude = intent.getDoubleExtra("longitude", 0f);
                 postalcode = intent.getStringExtra("postalcode");
-                Toast.makeText(MainActivity.this, "Lat: " + latitude + ", longi is: " + longitude + " postalcode: " + postalcode, Toast.LENGTH_LONG).show();
+              //  Toast.makeText(MainActivity.this, "Lat: " + latitude + ", longi is: " + longitude + " postalcode: " + postalcode, Toast.LENGTH_LONG).show();
             }
 
         }
