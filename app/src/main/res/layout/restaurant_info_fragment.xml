@@ -6,36 +6,33 @@
     android:layout_height="match_parent"
     tools:context=".RestaurantInfo">
 
-    <ImageView
-        android:id="@+id/resmoreInfoImage"
-        android:layout_width="409dp"
-        android:layout_height="312dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:adjustViewBounds="false"
-        android:scaleType="center"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/restViewPager2"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/resName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-black"
         android:text="Sushi Time"
         android:textColor="@color/foodie_red"
         android:textSize="30sp"
         android:typeface="normal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resmoreInfoImage" />
+        app:layout_constraintTop_toBottomOf="@+id/restViewPager2" />
 
     <TextView
         android:id="@+id/resPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="sans-serif-condensed-medium"
         android:text="$$$"
@@ -43,13 +40,14 @@
         android:textSize="30sp"
         android:typeface="normal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resmoreInfoImage" />
+        app:layout_constraintTop_toBottomOf="@+id/restViewPager2" />
 
     <TextView
         android:id="@+id/resRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
+        android:layout_marginTop="4dp"
         android:text="Rating: 4.5 / 5 (451 Reviews)"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="Sushi Bars, Ramen"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="8dp"
         android:text="(813)5979090"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -95,7 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
         android:text="Address"
         android:textColor="@color/foodie_red"
@@ -107,7 +105,7 @@
         android:layout_width="360dp"
         android:layout_height="124dp"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@color/black"
         android:textSize="18sp"

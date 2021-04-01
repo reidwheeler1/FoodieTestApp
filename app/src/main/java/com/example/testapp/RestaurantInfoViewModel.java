@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -25,8 +27,10 @@ public class RestaurantInfoViewModel extends ViewModel {
     private String type;
     private String phoneNumber;
     private String address;
+    private String city;
+    private String state;
     private String resCat;
-    private String[] photos;
+    private List<String> photos = new ArrayList<>();
     private ItemModel restaurant;
 
     public RestaurantInfoViewModel(ItemModel restaurant) {
@@ -47,8 +51,20 @@ public class RestaurantInfoViewModel extends ViewModel {
         return phoneNumber;
     }
 
+    public List<String> getPhotos() {
+        return photos;
+    }
+
     public ItemModel getRestaurant() {
         return restaurant;
+    }
+
+    public String getCat() {
+        return resCat;
+    }
+
+    public String getAddress() {
+        return address;
     }
 
     private void getMoreInfo(ItemModel restaurant){
@@ -67,11 +83,6 @@ public class RestaurantInfoViewModel extends ViewModel {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
 
-                    Headers responseHeaders = response.headers();
-                    for (int i = 0; i < responseHeaders.size(); i++) {
-                        System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                    }
-
                     jsonResponse[0] = response.body().string();
                     Log.i("TEST", jsonResponse[0]);
 
@@ -81,8 +92,17 @@ public class RestaurantInfoViewModel extends ViewModel {
                     String reviewCount = jsonObjResponse.getString("review_count");
                     String rate = jsonObjResponse.getString("rating");
                     rating = "Rating: " + rate + " / 5 "+ "(" + reviewCount + " Reviews)";
+                    JSONArray jsonPhotosArray = jsonObjResponse.getJSONArray("photos");
+                    for (int i = 0; i < jsonPhotosArray.length(); i++) {
+                        photos.add(jsonPhotosArray.getString(i));
+                    }
+                    JSONArray jsonCat = jsonObjResponse.getJSONArray("categories");
+                    resCat = jsonCat.getJSONObject(0).getString("title") + ", ";
+                    resCat = resCat + jsonCat.getJSONObject(1).getString("title");
 
-
+                    JSONObject jsonLocation = jsonObjResponse.getJSONObject("location");
+                    address = jsonLocation.getString("address1") + " " + jsonLocation.getString("address2")+ " " + jsonLocation.getString("address3")
+                            + "\n" + jsonLocation.getString("city")+ " " + jsonLocation.getString("zip_code")+ " " + jsonLocation.getString("state");
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }

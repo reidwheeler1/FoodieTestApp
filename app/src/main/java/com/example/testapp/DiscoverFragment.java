@@ -35,6 +35,9 @@ import okhttp3.Response;
  */
 public class DiscoverFragment extends Fragment {
 
+    private boolean loading = true;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
     RecyclerView gridData;
@@ -70,7 +73,8 @@ public class DiscoverFragment extends Fragment {
 
         List<ItemModel> items = fetchYelp();
         DiscoverAdapter adapter = new DiscoverAdapter(items);
-        gridData.setLayoutManager(new GridLayoutManager(getContext(),3));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3);
+        gridData.setLayoutManager(gridLayoutManager);
         gridData.setAdapter(adapter);
         final int spacing = 0;
         gridData.setPadding(spacing, spacing, spacing, spacing);
@@ -82,7 +86,32 @@ public class DiscoverFragment extends Fragment {
                 outRect.set(spacing, spacing, spacing, spacing);
             }
         });
+        gridData.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) { //check for scroll down
+                    visibleItemCount = gridLayoutManager.getChildCount();
+                    totalItemCount = gridLayoutManager.getItemCount();
+                    pastVisiblesItems = gridLayoutManager.findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            loading = false;
+                            Log.v("...", "Last Item Wow !");
+                            // Do pagination.. i.e. fetch new data
+                            List<ItemModel> newItems = fetchYelp();
+                            items.addAll(newItems);
+                            DiscoverAdapter adapter = new DiscoverAdapter(items);
+                            gridData.setAdapter(adapter);
+                            loading = true;
+                        }
+                    }
+                }
+            }
+        });
     }
+
+
 
     private List<ItemModel> fetchYelp() {
 
@@ -90,7 +119,7 @@ public class DiscoverFragment extends Fragment {
         List<ItemModel> items = new ArrayList<>();
 
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
-        String url = "https://api.yelp.com/v3/businesses/search?location=34695&sort_by=rating";
+        String url = "https://api.yelp.com/v3/businesses/search?location=34695&sort_by=rating&limit=50";
         final String[] jsonResponse = new String[1];
 
         Thread t = new Thread(new Runnable() {
@@ -119,7 +148,7 @@ public class DiscoverFragment extends Fragment {
                         String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                         String image_url = jsonArray.getJSONObject(i).getString("image_url");
                         String id = jsonArray.getJSONObject(i).getString("id");
-                        items.add(new ItemModel(image_url,name,price,location,id));
+                        items.add(new ItemModel(image_url,name,location,price,id));
                     }
 
 

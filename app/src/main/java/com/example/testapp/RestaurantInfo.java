@@ -1,19 +1,15 @@
 package com.example.testapp;
 
-import androidx.lifecycle.ViewModelProvider;
-
-import android.content.ClipData;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -35,18 +31,22 @@ public class RestaurantInfo extends Fragment {
     }
 
     private void init(View root) {
-        ImageView image = root.findViewById(R.id.resmoreInfoImage);
+        ViewPager2 viewPager = root.findViewById(R.id.restViewPager2);
         TextView resName = root.findViewById(R.id.resName);
         TextView resRating = root.findViewById(R.id.resRating);
         TextView resCat = root.findViewById(R.id.resCat);
         TextView price = root.findViewById(R.id.resPrice);
         TextView phoneNumber = root.findViewById(R.id.resPhoneNumber);
+        TextView resAddress = root.findViewById(R.id.resAddress);
 
-        Picasso.get().load(mViewModel.getRestaurant().getImage()).into(image);
+        RestaurantInfoAdapter adapter = new RestaurantInfoAdapter(mViewModel.getPhotos());
+        viewPager.setAdapter(adapter);
         resName.setText(mViewModel.getName());
         resRating.setText(mViewModel.getRating());
+        resCat.setText(mViewModel.getCat());
         price.setText(mViewModel.getRestaurant().getPrice_range());
         phoneNumber.setText(mViewModel.getPhoneNumber());
+        resAddress.setText(mViewModel.getAddress());
     }
 
     @Override
