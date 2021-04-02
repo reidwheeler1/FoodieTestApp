@@ -55,9 +55,9 @@ public class QuizCard extends Fragment {
     private RelativeLayout progressBar;
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
-    private List<ItemModel> itemModelReference;
     //
     private boolean gatheringPreferences = true; //Set to false in onCardSwiped() if paginating
+    private PreferenceList preferenceList;
     private List<ItemModel> likedPreferences;
 
     // Okhttp Client
@@ -118,6 +118,7 @@ public class QuizCard extends Fragment {
 
     private void init(View root) {
         CardStackView cardStackView = root.findViewById(R.id.card_stack_view);
+        preferenceList = new PreferenceList();
         likedPreferences = new ArrayList<>();
         manager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
@@ -129,7 +130,7 @@ public class QuizCard extends Fragment {
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
                 if (direction == Direction.Right && gatheringPreferences) {
-                    likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
+                    likedPreferences.add(adapter.getItems().get(manager.getTopPosition()-1));
                 }
                 if (direction == Direction.Right && !gatheringPreferences) {
                     //likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
@@ -140,9 +141,10 @@ public class QuizCard extends Fragment {
                 //Can optionally choose not to paginate; instead, lock card movement with
                 //prompt to reset by tapping suggestions on the bottom nav bar
                 if (manager.getTopPosition() == adapter.getItemCount()) {
-
-                    gatheringPreferences = false;
-                    paginate(); //Paginating: see function definition below
+                    if (likedPreferences.size() > 1) {
+                        gatheringPreferences = false;
+                        paginate(); //Paginating: see function definition below
+                    } else paginate(preferenceList.getPreferenceSubset());
                 }
             }
 
@@ -165,7 +167,7 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardDisappeared(View view, int position) {
                 TextView textView = view.findViewById(R.id.item_name);
-                Log.d(TAG, "onCardAppeared: " + position + ", name: " + textView.getText());
+                Log.d(TAG, "onCardDisappeared: " + position + ", name: " + textView.getText());
             }
         });
         //Modify carding swiping UX here:
@@ -217,18 +219,38 @@ public class QuizCard extends Fragment {
         }).start();
     }
 
+    //When current card stack is near end, integrate new items into stack
+    private void paginate(List<ItemModel> new_items) {
+        Log.i("Preference Paginate", "Line 225");
+        //Start spinner
+        progressBar.setVisibility(View.VISIBLE);
+        //new thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
+                List<ItemModel> old_items = adapter.getItems();
+                CardStackCallback callback = new CardStackCallback(old_items, new_items);
+                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
+                adapter.setItems(new_items);
+                //run below on UI thread
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.dispatchUpdatesTo(adapter);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }).start();
+    }
+
     /*Creates a list of 5 preference options used to customize restaurant search*/
     private List<ItemModel> addPreferenceList() {
-        itemModelReference = new ArrayList<>();
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                "Chicken", "", "", "chicken_wings"));
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1565299715199-866c917206bb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=714&q=80",
-                "Steak", "", "", "steak"));
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1587841424505-4205a6e73ef7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-                "Burgers", "", "", "burgers"));
+        List<ItemModel> itemModelReference = preferenceList.getPreferenceSubset();
+
+        //if (itemModelReference.isEmpty())
+        //Add "Out of options" card and lock card movement
 
         return itemModelReference;
     }
@@ -291,7 +313,13 @@ public class QuizCard extends Fragment {
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
                 String id = jsonArray.getJSONObject(i).getString("id");
-                items.add(new ItemModel(image_url,name,price,location,id));
+
+                List<String> categories = new ArrayList<>();
+                JSONArray cats = jsonArray.getJSONObject(i).getJSONArray("categories");
+                for (int j = 0; j < cats.length(); j++)
+                    categories.add(cats.getJSONObject(j).getString("alias"));
+
+                items.add(new ItemModel(image_url,name,price,location,id, categories));
             }
 
         } catch (JSONException e){
