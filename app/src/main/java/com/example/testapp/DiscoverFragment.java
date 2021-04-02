@@ -119,7 +119,7 @@ public class DiscoverFragment extends Fragment {
         List<ItemModel> items = new ArrayList<>();
 
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
-        String url = "https://api.yelp.com/v3/businesses/search?location=34695&sort_by=rating&limit=50";
+        String url = "https://api.yelp.com/v3/businesses/search?location="+MainActivity.getPostalcode()+"&sort_by=rating&limit=50";
         final String[] jsonResponse = new String[1];
 
         Thread t = new Thread(new Runnable() {
