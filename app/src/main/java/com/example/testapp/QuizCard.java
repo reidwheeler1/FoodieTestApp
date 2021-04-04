@@ -62,6 +62,7 @@ public class QuizCard extends Fragment {
     private PreferenceList preferenceList;
     private List<ItemModel> likedPreferences;
     private List<ItemModel> currentSetLikedRestaurants;
+    private List<ItemModel> currentSetDislikedRestaurants;
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
@@ -124,6 +125,7 @@ public class QuizCard extends Fragment {
         preferenceList = new PreferenceList();
         likedPreferences = new ArrayList<>();
         currentSetLikedRestaurants = new ArrayList<>();
+        currentSetDislikedRestaurants = new ArrayList<>();
         manager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
             public void onCardDragging(Direction direction, float ratio) {
@@ -134,17 +136,19 @@ public class QuizCard extends Fragment {
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
                 Log.i(TAG, "Categories: " + Utilities.categoriesToString(adapter.getItems().get(manager.getTopPosition()-1).getCategories()));
-                if (direction == Direction.Right && gatheringPreferences) {
+
+                if (direction == Direction.Right && gatheringPreferences) { //Tracking initial preferences
                     likedPreferences.add(adapter.getItems().get(manager.getTopPosition()-1));
                 }
-                if (direction == Direction.Right && !gatheringPreferences) {
+                if (direction == Direction.Right && !gatheringPreferences) { //Tracking liked restaurants
                     currentSetLikedRestaurants.add(adapter.getItems().get(manager.getTopPosition()-1));
                     MainActivity.likes += itemToString(adapter.getItems().get(manager.getTopPosition()-1));
                 }
+                if (direction ==Direction.Left && !gatheringPreferences) { //Tracking disliked restaurants
+                    currentSetDislikedRestaurants.add(adapter.getItems().get(manager.getTopPosition()-1));
+                }
 
                 //If getTopPosition == original item count, paginate card stack
-                //Can optionally choose not to paginate; instead, lock card movement with
-                //prompt to reset by tapping suggestions on the bottom nav bar
                 if (manager.getTopPosition() == adapter.getItemCount()) {
                     if (likedPreferences.size() > 0) {
                         paginate(); //Paginating: see function definition below
@@ -318,7 +322,9 @@ public class QuizCard extends Fragment {
 
     private String identifyCommonCategories() {
         String result = "all";
+        List<String> commonCats = new ArrayList<>();
         Map<String, Integer> catMap = new HashMap<>();
+        //Count the occurrence of categories
         for (ItemModel list : currentSetLikedRestaurants) {
             for (String cat : list.getCategories()) {
                 if (!catMap.containsKey(cat))
@@ -327,13 +333,54 @@ public class QuizCard extends Fragment {
                     catMap.put(cat, catMap.get(cat) + 1);
             }
         }
+        //Get most common category(s)
         int mostCommonCat = -1;
+        for (String cat : catMap.keySet()) {
+            if (mostCommonCat == -1 || catMap.get(cat) >= mostCommonCat) {
+                mostCommonCat = catMap.get(cat);
+                commonCats.add(cat);
+            }
+        }
+        //Remove most common categories from map
+        for (String cat : commonCats) {
+            catMap.remove(cat);
+        }
+        //Get second most common category(s)
+        mostCommonCat = 2;
+        for (String cat : catMap.keySet()) {
+            if (catMap.size() == 1 || catMap.get(cat) >= mostCommonCat) {
+                mostCommonCat = catMap.get(cat);
+                commonCats.add(cat);
+            }
+        }
+        //Get most common disliked category
+        catMap.clear();
+        for (ItemModel list : currentSetDislikedRestaurants) {
+            for (String cat : list.getCategories()) {
+                if (!catMap.containsKey(cat))
+                    catMap.put(cat, 1);
+                else
+                    catMap.put(cat, catMap.get(cat) + 1);
+            }
+        }
+        mostCommonCat = -1;
+        String badCat = "badCat";
         for (String cat : catMap.keySet()) {
             if (mostCommonCat == -1 || catMap.get(cat) > mostCommonCat) {
                 mostCommonCat = catMap.get(cat);
+                badCat = cat;
+            }
+        }
+        //Remove most disliked category if doing so won't leave common categories empty
+        if (commonCats.size() > 1)
+            commonCats.remove(badCat);
+        //Creating string of common categories
+        mostCommonCat = -1;
+        for (String cat : commonCats) {
+            if (mostCommonCat == -1) {
+                mostCommonCat = 0;
                 result = cat;
-            } else if (catMap.get(cat) == mostCommonCat)
-                result = result + "," + cat;
+            } else result = result + "," + cat;
         }
         Log.d("IdentifyCommonCategories", result);
         currentSetLikedRestaurants.clear(); //Prepare for next set
