@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ public class profileAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_expandable_list_item_1,parent,false);
+
         TextView textView = convertView.findViewById(android.R.id.text1);
 
         String sgroup = String.valueOf(getGroup(groupPosition));
@@ -81,6 +83,17 @@ public class profileAdapter extends BaseExpandableListAdapter {
         String sChild = String.valueOf(getChild(groupPosition,childPosition));
 
         textView.setText(sChild);
+
+        textView.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                //Dialog dialog = new D;
+                Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+
 
         textView.setOnClickListener(new View.OnClickListener(){
 

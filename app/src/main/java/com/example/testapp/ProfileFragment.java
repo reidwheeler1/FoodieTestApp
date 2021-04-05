@@ -46,7 +46,7 @@ public class ProfileFragment extends Fragment {
         // Defines the xml file for the fragment // Inflate the layout for this fragment
 
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_quiz_card, parent, false);
+        View root = inflater.inflate(R.layout.fragment_profile, parent, false);
         progressBar = root.findViewById(R.id.loadingPanel);
         init(root);
         return root;
@@ -59,17 +59,37 @@ public class ProfileFragment extends Fragment {
 
         ExpandableListView expandableListView = root.findViewById(R.id.expandableListView);
 
-        for (int g = 0 ; g<= 10; g++)
+        for (int g = 0 ; g<= 2; g++)
         {
             //add list values
-            listGroup.add("Group"+g);
-            //init array list
-            ArrayList<String> arrayList = new ArrayList<>();
-            //loop
-            for (int c= 0; c<=6; c++){
-                arrayList.add("item"+c);
+            if (g == 0 ){
+                listGroup.add("About");
+                ArrayList<String> arrayList = new ArrayList<>();
+                arrayList.add("ABOUT THE APP INFO CHANGE HERE");
+                listChild.put(listGroup.get(g),arrayList);
             }
-            listChild.put(listGroup.get(g),arrayList);
+            else if (g == 1 ){
+                listGroup.add("Dietary Preferences");
+                //init array list
+                ArrayList<String> arrayList = new ArrayList<>();
+                //loop
+                for (int c= 0; c<=5; c++){
+                    arrayList.add("item"+c);
+                }
+                listChild.put(listGroup.get(g),arrayList);
+            }
+            else if (g == 2 ){
+                listGroup.add("Likes");
+                //init array list
+                ArrayList<String> arrayList = new ArrayList<>();
+                //loop
+                for (int c= 0; c<=5; c++){
+                    arrayList.add("item"+c);
+
+                }
+                listChild.put(listGroup.get(g),arrayList);
+            }
+
         }
 
         adapter = new profileAdapter(listGroup,listChild);
