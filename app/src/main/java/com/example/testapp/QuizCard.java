@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,7 +38,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -55,10 +59,12 @@ public class QuizCard extends Fragment {
     private RelativeLayout progressBar;
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
-    private List<ItemModel> itemModelReference;
     //
-    private boolean gatheringPreferences = true; //Set to false in onCardSwiped() if paginating
+    private boolean gatheringPreferences = true; //Set to false in paginate()
+    private PreferenceList preferenceList;
     private List<ItemModel> likedPreferences;
+    private List<ItemModel> currentSetLikedRestaurants;
+    private List<ItemModel> currentSetDislikedRestaurants;
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
@@ -118,7 +124,10 @@ public class QuizCard extends Fragment {
 
     private void init(View root) {
         CardStackView cardStackView = root.findViewById(R.id.card_stack_view);
+        preferenceList = new PreferenceList();
         likedPreferences = new ArrayList<>();
+        currentSetLikedRestaurants = new ArrayList<>();
+        currentSetDislikedRestaurants = new ArrayList<>();
         manager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
             public void onCardDragging(Direction direction, float ratio) {
@@ -128,21 +137,24 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " count=" + adapter.getItemCount() + " d=" + direction);
-                if (direction == Direction.Right && gatheringPreferences) {
-                    likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
+                Log.i(TAG, "Categories: " + Utilities.categoriesToString(adapter.getItems().get(manager.getTopPosition()-1).getCategories()));
+
+                if (direction == Direction.Right && gatheringPreferences) { //Tracking initial preferences
+                    likedPreferences.add(adapter.getItems().get(manager.getTopPosition()-1));
                 }
-                if (direction == Direction.Right && !gatheringPreferences) {
-                    //likedPreferences.add(itemModelReference.get(manager.getTopPosition()-1));
+                if (direction == Direction.Right && !gatheringPreferences) { //Tracking liked restaurants
+                    currentSetLikedRestaurants.add(adapter.getItems().get(manager.getTopPosition()-1));
                     MainActivity.likes += itemToString(adapter.getItems().get(manager.getTopPosition()-1));
+                }
+                if (direction ==Direction.Left && !gatheringPreferences) { //Tracking disliked restaurants
+                    currentSetDislikedRestaurants.add(adapter.getItems().get(manager.getTopPosition()-1));
                 }
 
                 //If getTopPosition == original item count, paginate card stack
-                //Can optionally choose not to paginate; instead, lock card movement with
-                //prompt to reset by tapping suggestions on the bottom nav bar
                 if (manager.getTopPosition() == adapter.getItemCount()) {
-
-                    gatheringPreferences = false;
-                    paginate(); //Paginating: see function definition below
+                    if (likedPreferences.size() > 0) {
+                        paginate(); //Paginating: see function definition below
+                    } else paginatePreferences();
                 }
             }
 
@@ -165,7 +177,7 @@ public class QuizCard extends Fragment {
             @Override
             public void onCardDisappeared(View view, int position) {
                 TextView textView = view.findViewById(R.id.item_name);
-                Log.d(TAG, "onCardAppeared: " + position + ", name: " + textView.getText());
+                //Log.d(TAG, "onCardDisappeared: " + position + ", name: " + textView.getText());
             }
         });
         //Modify carding swiping UX here:
@@ -185,7 +197,7 @@ public class QuizCard extends Fragment {
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
 
         manager.setOverlayInterpolator(new LinearInterpolator());
-        adapter = new CardStackAdapter(addPreferenceList());
+        adapter = new CardStackAdapter(preferenceList.getPreferenceSubset());
         cardStackView.setLayoutManager(manager);
         cardStackView.setAdapter(adapter);
         cardStackView.setItemAnimator(new DefaultItemAnimator());
@@ -209,6 +221,7 @@ public class QuizCard extends Fragment {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                    @Override
                    public void run() {
+                       gatheringPreferences = false;
                        result.dispatchUpdatesTo(adapter);
                        progressBar.setVisibility(View.GONE);
                    }
@@ -217,27 +230,31 @@ public class QuizCard extends Fragment {
         }).start();
     }
 
-    /*Creates a list of 5 preference options used to customize restaurant search*/
-    private List<ItemModel> addPreferenceList() {
-        itemModelReference = new ArrayList<>();
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                "Chicken", "", "", "chicken_wings"));
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1565299715199-866c917206bb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=714&q=80",
-                "Steak", "", "", "steak"));
-        itemModelReference.add(new ItemModel(
-                "https://images.unsplash.com/photo-1587841424505-4205a6e73ef7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-                "Burgers", "", "", "burgers"));
-
-        return itemModelReference;
+    /*Paginates cardstack when empty with subset of preferences; locks card when preferences run out*/
+    private void paginatePreferences() {
+        List<ItemModel> old_items = adapter.getItems();
+        List<ItemModel> new_items = preferenceList.getPreferenceSubset();
+        if (new_items.isEmpty()) {
+            manager.setCanScrollVertical(false);
+            manager.setCanScrollHorizontal(false);
+            new_items.add(new ItemModel(
+                    "https://images.unsplash.com/photo-1454117096348-e4abbeba002c?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
+                    "Are you sure you're hungry?", "", "", ""));
+        }
+        CardStackCallback callback = new CardStackCallback(old_items, new_items);
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
+        adapter.setItems(new_items);
+        result.dispatchUpdatesTo(adapter);
     }
 
     private String constructURL() {
         String url = "&categories=";
-        url = url + likedPreferences.get(0).getIdentifier();
-        for (int i=1; i < likedPreferences.size(); i++)
-            url = url + "," + likedPreferences.get(i).getIdentifier();
+        if (gatheringPreferences) {
+            url = url + likedPreferences.get(0).getIdentifier();
+            for (int i = 1; i < likedPreferences.size(); i++)
+                url = url + "," + likedPreferences.get(i).getIdentifier();
+        } else
+            url = url + identifyCommonCategories();
         return url;
     }
 
@@ -291,7 +308,13 @@ public class QuizCard extends Fragment {
                 String location = jsonArray.getJSONObject(i).getJSONObject("location").getString("address1");
                 String image_url = jsonArray.getJSONObject(i).getString("image_url");
                 String id = jsonArray.getJSONObject(i).getString("id");
-                items.add(new ItemModel(image_url,name,price,location,id));
+
+                List<String> categories = new ArrayList<>();
+                JSONArray cats = jsonArray.getJSONObject(i).getJSONArray("categories");
+                for (int j = 0; j < cats.length(); j++)
+                    categories.add(cats.getJSONObject(j).getString("alias"));
+
+                items.add(new ItemModel(image_url,name,price,location,id, categories));
             }
 
         } catch (JSONException e){
@@ -299,7 +322,69 @@ public class QuizCard extends Fragment {
         }
     }
 
+    private String identifyCommonCategories() {
+        String result = "all";
+        int mostCommonCat = -1;
+        int secondMostCom = -1;
+        Map<String, Integer> catMap = new HashMap<>();
+        Map<String, Integer> badCatMap = new HashMap<>();
+        //Count the occurrence of categories and track two highest counts
+        for (ItemModel list : currentSetLikedRestaurants) {
+            int tempCount;
+            for (String cat : list.getCategories()) {
+                if (!catMap.containsKey(cat))
+                    catMap.put(cat, 1);
+                else
+                    catMap.put(cat, catMap.get(cat) + 1);
 
+                tempCount = catMap.get(cat);
+                if (tempCount > mostCommonCat)
+                    mostCommonCat = tempCount;
+                else if (tempCount > secondMostCom)
+                    secondMostCom = tempCount;
+            }
+        }
+        //Count occurrence of disliked categories and track the count
+        int mostDislikedCat = -1;
+        for (ItemModel list : currentSetDislikedRestaurants) {
+            int tempCount;
+            for (String cat : list.getCategories()) {
+                if (!badCatMap.containsKey(cat))
+                    badCatMap.put(cat, 1);
+                else
+                    badCatMap.put(cat, badCatMap.get(cat) + 1);
+
+                tempCount = badCatMap.get(cat);
+                if (tempCount > mostDislikedCat)
+                    mostDislikedCat = tempCount;
+            }
+        }
+        //Remove less common disliked categories from dislikes Map
+        List<String> tempSet = new ArrayList<>(badCatMap.keySet()); //Needed to avoid ConcurrentModificationException
+        for (String cat : tempSet) {
+            if (badCatMap.get(cat) == mostDislikedCat)
+                badCatMap.remove(cat);
+        }
+        //Add 1st and 2nd most common categories to string - most disliked (unless it is also top liked)
+        int count;
+        boolean firstCatNotYetAdded = true;
+        for (String cat : catMap.keySet()) {
+            count = catMap.get(cat);
+            if (firstCatNotYetAdded) {
+                if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
+                    result = cat;
+                    firstCatNotYetAdded = false;
+                }
+            } else if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
+                result = result + "," + cat;
+            }
+        }
+
+        Log.d("IdentifyCommonCategories", result);
+        currentSetLikedRestaurants.clear(); //Prepare for next set
+        currentSetDislikedRestaurants.clear();
+        return result;
+    }
 
     private String itemToString (ItemModel item) {
         for (int i = 0; i < MainActivity.items.size(); i++) {
@@ -314,5 +399,20 @@ public class QuizCard extends Fragment {
         additem += "," + item.getPrice_range();
         additem += "," + item.getIdentifier() + "\n";
         return additem;
+    }
+}
+
+class Utilities {
+    public static String categoriesToString(List<String> list) {
+        String ret = "";
+
+        if (list == null || list.isEmpty())
+            return ret;
+
+        ret += list.get(0);
+        for (int i=1; i<list.size(); i++)
+            ret += ", " + list.get(i);
+
+        return ret;
     }
 }
