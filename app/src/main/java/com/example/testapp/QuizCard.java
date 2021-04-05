@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -322,68 +324,65 @@ public class QuizCard extends Fragment {
 
     private String identifyCommonCategories() {
         String result = "all";
-        List<String> commonCats = new ArrayList<>();
-        Map<String, Integer> catMap = new HashMap<>();
-        //Count the occurrence of categories
-        for (ItemModel list : currentSetLikedRestaurants) {
-            for (String cat : list.getCategories()) {
-                if (!catMap.containsKey(cat))
-                    catMap.put(cat, 1);
-                else
-                    catMap.put(cat, catMap.get(cat) + 1);
-            }
-        }
-        //Get most common category(s)
         int mostCommonCat = -1;
-        for (String cat : catMap.keySet()) {
-            if (mostCommonCat == -1 || catMap.get(cat) >= mostCommonCat) {
-                mostCommonCat = catMap.get(cat);
-                commonCats.add(cat);
-            }
-        }
-        //Remove most common categories from map
-        for (String cat : commonCats) {
-            catMap.remove(cat);
-        }
-        //Get second most common category(s)
-        mostCommonCat = 2;
-        for (String cat : catMap.keySet()) {
-            if (catMap.size() == 1 || catMap.get(cat) >= mostCommonCat) {
-                mostCommonCat = catMap.get(cat);
-                commonCats.add(cat);
-            }
-        }
-        //Get most common disliked category
-        catMap.clear();
-        for (ItemModel list : currentSetDislikedRestaurants) {
+        int secondMostCom = -1;
+        Map<String, Integer> catMap = new HashMap<>();
+        Map<String, Integer> badCatMap = new HashMap<>();
+        //Count the occurrence of categories and track two highest counts
+        for (ItemModel list : currentSetLikedRestaurants) {
+            int tempCount;
             for (String cat : list.getCategories()) {
                 if (!catMap.containsKey(cat))
                     catMap.put(cat, 1);
                 else
                     catMap.put(cat, catMap.get(cat) + 1);
+
+                tempCount = catMap.get(cat);
+                if (tempCount > mostCommonCat)
+                    mostCommonCat = tempCount;
+                else if (tempCount > secondMostCom)
+                    secondMostCom = tempCount;
             }
         }
-        mostCommonCat = -1;
-        String badCat = "badCat";
+        //Count occurrence of disliked categories and track the count
+        int mostDislikedCat = -1;
+        for (ItemModel list : currentSetDislikedRestaurants) {
+            int tempCount;
+            for (String cat : list.getCategories()) {
+                if (!badCatMap.containsKey(cat))
+                    badCatMap.put(cat, 1);
+                else
+                    badCatMap.put(cat, badCatMap.get(cat) + 1);
+
+                tempCount = badCatMap.get(cat);
+                if (tempCount > mostDislikedCat)
+                    mostDislikedCat = tempCount;
+            }
+        }
+        //Remove less common disliked categories from dislikes Map
+        List<String> tempSet = new ArrayList<>(badCatMap.keySet()); //Needed to avoid ConcurrentModificationException
+        for (String cat : tempSet) {
+            if (badCatMap.get(cat) == mostDislikedCat)
+                badCatMap.remove(cat);
+        }
+        //Add 1st and 2nd most common categories to string - most disliked (unless it is also top liked)
+        int count;
+        boolean firstCatNotYetAdded = true;
         for (String cat : catMap.keySet()) {
-            if (mostCommonCat == -1 || catMap.get(cat) > mostCommonCat) {
-                mostCommonCat = catMap.get(cat);
-                badCat = cat;
+            count = catMap.get(cat);
+            if (firstCatNotYetAdded) {
+                if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
+                    result = cat;
+                    firstCatNotYetAdded = false;
+                }
+            } else if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
+                result = result + "," + cat;
             }
         }
-        //Remove most disliked category if doing so won't leave common categories empty
-        if (commonCats.size() > 1)
-            commonCats.remove(badCat);
-        //Creating string of common categories
-        mostCommonCat = -1;
-        for (String cat : commonCats) {
-            if (mostCommonCat == -1) {
-                mostCommonCat = 0;
-                result = cat;
-            } else result = result + "," + cat;
-        }
+
         Log.d("IdentifyCommonCategories", result);
         currentSetLikedRestaurants.clear(); //Prepare for next set
+        currentSetDislikedRestaurants.clear();
         return result;
     }
 
