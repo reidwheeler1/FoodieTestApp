@@ -91,6 +91,7 @@ public class profileAdapter extends BaseExpandableListAdapter {
             public boolean onLongClick(View v) {
                 //Dialog dialog = new D;
                 Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
+
                 MainActivity.items.remove(childPosition);
                 listChild.remove(listGroup.get(groupPosition)).get(childPosition);
                 return false;
