@@ -1,17 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".ProfileFragment">
 
-    <ExpandableListView
-         android:id="@+id/expandableListView"
-         android:layout_height="match_parent"
-         android:layout_width="match_parent"
-         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
-         android:divider="@android:color/darker_gray"
-         android:dividerHeight="0.5dp" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/aboutTV"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="About"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/foodie_red"
+            android:paddingLeft="40dp" />
+
+        <TextView
+            android:id="@+id/aboutParagraphsTV"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/about_app_text"
+            android:paddingLeft="40dp"
+            android:paddingRight="20dp"/>
+
+        <TextView
+            android:id="@+id/dietaryPreferencesTV"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Dietary Preferences"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/foodie_red"
+            android:paddingLeft="40dp" />
+
+        <Switch
+            android:id="@+id/veganSwitch"
+            android:text="Vegan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:paddingRight="20dp"/>
+
+        <Switch
+            android:id="@+id/vegetarianSwitch"
+            android:text="Vegetarian"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:paddingRight="20dp"/>
+
+        <Switch
+            android:id="@+id/glutenSwitch"
+            android:text="Gluten-Free"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:paddingRight="20dp"/>
+
+        <Switch
+            android:id="@+id/kosherSwitch"
+            android:text="Kosher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:paddingRight="20dp"/>
+
+        <TextView
+            android:id="@+id/likesTV"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Likes"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/foodie_red"
+            android:paddingLeft="40dp" />
+
+
+        <ExpandableListView
+             android:id="@+id/expandableListView"
+             android:layout_height="match_parent"
+             android:layout_width="match_parent"
+             android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+             android:divider="@android:color/darker_gray"
+             android:dividerHeight="0.5dp"
+             app:layout_constraintTop_toBottomOf="@id/likesTV"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintLeft_toLeftOf="parent"
+             app:layout_constraintRight_toRightOf="parent" />
+
+    </LinearLayout>
+
+</ScrollView>
