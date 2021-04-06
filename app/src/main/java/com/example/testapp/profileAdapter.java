@@ -1,12 +1,8 @@
 package com.example.testapp;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
-import android.view.VerifiedInputEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -44,6 +40,7 @@ public class profileAdapter extends BaseExpandableListAdapter {
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         return listChild.get(listGroup.get(groupPosition)).get(childPosition);
+
     }
 
     @Override
@@ -89,11 +86,23 @@ public class profileAdapter extends BaseExpandableListAdapter {
         textView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v) {
+                String tempGroup;
+                HashMap<String, ArrayList<String>> tempChild;
                 //Dialog dialog = new D;
                 Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
-
+                //Toast.makeText(parent.getContext(), listChild.remove(listGroup.get(groupPosition)).get(childPosition).toString(),Toast.LENGTH_SHORT).show();
                 MainActivity.items.remove(childPosition);
-                listChild.remove(listGroup.get(groupPosition)).get(childPosition);
+
+                //listChild.remove(listGroup.get(groupPosition)).get(childPosition);
+               // tempGroup = listGroup.get(2);
+               // tempChild = listChild;
+               // listChild.remove(listGroup.get(groupPosition));
+               // listGroup.remove(listGroup.get(groupPosition));
+               // notifyDataSetChanged();
+               // listGroup.add(tempGroup);
+               // listChild.putAll(tempChild);
+                notifyDataSetChanged();
+
                 return false;
             }
         });
@@ -115,4 +124,15 @@ public class profileAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
+
+    public void setListChild(HashMap<String, ArrayList<String>> listChild1){
+        this.listChild = listChild1;
+    }
+
+
+    public HashMap<String, ArrayList<String>>  deletingItem(){
+        return this.listChild;
+    }
+
+
 }

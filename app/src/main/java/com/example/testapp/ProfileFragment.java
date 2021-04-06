@@ -6,7 +6,11 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListUpdateCallback;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,7 @@ import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class ProfileFragment extends Fragment {
@@ -36,7 +41,7 @@ public class ProfileFragment extends Fragment {
     ArrayList<String> listGroup = new ArrayList<>();
     HashMap<String,ArrayList<String>> listChild = new HashMap<>();
     profileAdapter adapter;
-
+    public static boolean deleting = false;
     private RelativeLayout progressBar;
 
 
@@ -91,11 +96,43 @@ public class ProfileFragment extends Fragment {
                 }
                 listChild.put(listGroup.get(g),arrayList);
             }
+            if ( deleting ) {
+
+               deleting = false;
+                paginate(); //Paginating: see function definition below
+            }
 
         }
 
         adapter = new profileAdapter(listGroup,listChild);
         expandableListView.setAdapter(adapter);
+    }
+
+
+
+    private void paginate() {
+        //Start spinner
+        progressBar.setVisibility(View.VISIBLE);
+        //new thread
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
+                ProfileCallback callback = new ProfileCallback(listChild, adapter.listChild);
+                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
+                adapter.setListChild(adapter.deletingItem());
+                //run below on UI thread
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.dispatchUpdatesTo((ListUpdateCallback) adapter);
+                        progressBar.setVisibility(View.GONE);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
     }
 
 }
