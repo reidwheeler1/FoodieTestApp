@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -68,8 +69,9 @@ public class profileAdapter extends BaseExpandableListAdapter {
         String sgroup = String.valueOf(getGroup(groupPosition));
 
         textView.setText(sgroup);
+        textView.setTextSize(20);
         textView.setTypeface(null, Typeface.BOLD);
-        textView.setTextColor(Color.BLUE);
+
 
         return convertView;
     }
