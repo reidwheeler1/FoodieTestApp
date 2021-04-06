@@ -1,6 +1,8 @@
 package com.example.testapp;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -89,6 +91,8 @@ public class profileAdapter extends BaseExpandableListAdapter {
             public boolean onLongClick(View v) {
                 //Dialog dialog = new D;
                 Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
+                MainActivity.items.remove(childPosition);
+                listChild.remove(listGroup.get(groupPosition)).get(childPosition);
                 return false;
             }
         });

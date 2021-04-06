@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 if (savedInstanceState == null) {
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
-                            .add(R.id.fragment_container_view, ProfileFragment.class, null)
+                            .add(R.id.fragment_container_view, QuizCard.class, null)
                             .commit();
                 }
 
@@ -193,10 +193,18 @@ GPS functions
     }
 // likes store in a CSV with each Item model parameter in the order of assignment in the oobject class
     public void writeLikes() throws IOException {
+//clears likes before adding
+        FileOutputStream fos = openFileOutput(filename, 0);
+        fos.write("".getBytes());
+        fos.close();
+        fos = openFileOutput(filename, Context.MODE_APPEND);
+            fos.flush();
+            for ( int i = 0 ; i < items.size() ; i++){
 
-        FileOutputStream fos = openFileOutput(filename, Context.MODE_APPEND);
+                fos.write(items.get(i).printItem().getBytes());
 
-            fos.write(likes.getBytes());
+            }
+
 
             Log.i("mylog","likes text: " + likes );
             likes = "";
@@ -207,15 +215,29 @@ GPS functions
 
 //read in likes file if it exists and load them into project
     private void readLikes() throws FileNotFoundException {
+
         FileInputStream fis = openFileInput(filename);
         String[] itemContent;
         Scanner scanner = new Scanner(fis);
+        boolean add = true;
         while (scanner.hasNextLine()) {
+
             String content = scanner.nextLine();
             itemContent = content.split(",");
             itemContent[4] = itemContent[4].trim();
             ItemModel itemModel = new ItemModel(itemContent[0],itemContent[1],itemContent[2],itemContent[3],itemContent[4]);
-            items.add(itemModel);
+            if (items.size() == 0){ items.add(itemModel);}
+            for (int i = 0; i < items.size() && add; i++) {
+                if ( add && !(items.get(i).getIdentifier().equals(itemContent[4]))) {
+                    items.add(itemModel);
+                    add =false;
+
+                }
+            }
+
+            add = true;
+
+
             Log.i("mylog","file content: " + items.get(items.size()-1).getName());
         }
 

@@ -78,13 +78,15 @@ public class ProfileFragment extends Fragment {
                 }
                 listChild.put(listGroup.get(g),arrayList);
             }
-            else if (g == 2 ){
+            else if (g == 2  ){
                 listGroup.add("Likes");
                 //init array list
                 ArrayList<String> arrayList = new ArrayList<>();
                 //loop
                 for (int c= 0; c< MainActivity.items.size() ; c++){
-                    arrayList.add( MainActivity.items.get(c).getName() ) ;
+                    if (!arrayList.contains(MainActivity.items.get(c).getName())){
+                        arrayList.add( MainActivity.items.get(c).getName() ) ;
+                    }
 
                 }
                 listChild.put(listGroup.get(g),arrayList);

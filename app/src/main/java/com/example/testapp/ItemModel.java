@@ -34,4 +34,13 @@ public class ItemModel {
     public String getPrice_range() { return price_range; }
 
     public String getIdentifier() { return identifier; }
+
+    public String printItem(){
+        String additem = this.getImage();
+        additem += "," + this.getName();
+        additem += "," + this.getLocation();
+        additem += "," + this.getPrice_range();
+        additem += "," + this.getIdentifier() + "\n";
+        return additem;
+    }
 }
