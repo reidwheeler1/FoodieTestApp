@@ -398,6 +398,7 @@ public class QuizCard extends Fragment {
         additem += "," + item.getLocation();
         additem += "," + item.getPrice_range();
         additem += "," + item.getIdentifier() + "\n";
+        MainActivity.items.add(item);
         return additem;
     }
 }

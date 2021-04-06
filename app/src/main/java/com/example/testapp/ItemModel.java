@@ -57,5 +57,15 @@ public class ItemModel {
 
     public String getIdentifier() { return identifier; }
 
+    public String printItem(){
+        String additem = this.getImage();
+        additem += "," + this.getName();
+        additem += "," + this.getLocation();
+        additem += "," + this.getPrice_range();
+        additem += "," + this.getIdentifier() + "\n";
+        return additem;
+    }
+
     public List<String> getCategories() { return categories; }
+
 }
