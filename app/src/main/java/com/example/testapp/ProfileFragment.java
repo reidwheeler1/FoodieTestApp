@@ -68,7 +68,7 @@ public class ProfileFragment extends Fragment {
         {
             //add list values
            if (g == 0  ){
-                listGroup.add("Likes");
+                listGroup.add("");
                 //init array list
                 ArrayList<String> arrayList = new ArrayList<>();
                 //loop
