@@ -67,23 +67,7 @@ public class ProfileFragment extends Fragment {
         for (int g = 0 ; g<= 2; g++)
         {
             //add list values
-            if (g == 0 ){
-                listGroup.add("About");
-                ArrayList<String> arrayList = new ArrayList<>();
-                arrayList.add("ABOUT THE APP INFO CHANGE HERE");
-                listChild.put(listGroup.get(g),arrayList);
-            }
-            else if (g == 1 ){
-                listGroup.add("Dietary Preferences");
-                //init array list
-                ArrayList<String> arrayList = new ArrayList<>();
-                //loop
-                for (int c= 0; c<=5; c++){
-                    arrayList.add("item"+c);
-                }
-                listChild.put(listGroup.get(g),arrayList);
-            }
-            else if (g == 2  ){
+           if (g == 0  ){
                 listGroup.add("Likes");
                 //init array list
                 ArrayList<String> arrayList = new ArrayList<>();
@@ -96,11 +80,7 @@ public class ProfileFragment extends Fragment {
                 }
                 listChild.put(listGroup.get(g),arrayList);
             }
-            if ( deleting ) {
 
-               deleting = false;
-                paginate(); //Paginating: see function definition below
-            }
 
         }
 
@@ -109,30 +89,5 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
-    private void paginate() {
-        //Start spinner
-        progressBar.setVisibility(View.VISIBLE);
-        //new thread
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
-                ProfileCallback callback = new ProfileCallback(listChild, adapter.listChild);
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-                adapter.setListChild(adapter.deletingItem());
-                //run below on UI thread
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        result.dispatchUpdatesTo((ListUpdateCallback) adapter);
-                        progressBar.setVisibility(View.GONE);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
-    }
 
 }

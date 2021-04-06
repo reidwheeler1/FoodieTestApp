@@ -2,6 +2,7 @@ package com.example.testapp;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,24 +87,15 @@ public class profileAdapter extends BaseExpandableListAdapter {
         textView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v) {
-                String tempGroup;
-                HashMap<String, ArrayList<String>> tempChild;
-                //Dialog dialog = new D;
                 Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
-                //Toast.makeText(parent.getContext(), listChild.remove(listGroup.get(groupPosition)).get(childPosition).toString(),Toast.LENGTH_SHORT).show();
+                String id = MainActivity.items.get(childPosition).getName();
+                String groupId = listGroup.get(groupPosition);
+                Log.d("Profile: onLongClick", id);
                 MainActivity.items.remove(childPosition);
-
-                //listChild.remove(listGroup.get(groupPosition)).get(childPosition);
-               // tempGroup = listGroup.get(2);
-               // tempChild = listChild;
-               // listChild.remove(listGroup.get(groupPosition));
-               // listGroup.remove(listGroup.get(groupPosition));
-               // notifyDataSetChanged();
-               // listGroup.add(tempGroup);
-               // listChild.putAll(tempChild);
+                listChild.get(groupId).remove(childPosition);
                 notifyDataSetChanged();
-
                 return false;
+
             }
         });
 
@@ -133,6 +125,8 @@ public class profileAdapter extends BaseExpandableListAdapter {
     public HashMap<String, ArrayList<String>>  deletingItem(){
         return this.listChild;
     }
+
+
 
 
 }
