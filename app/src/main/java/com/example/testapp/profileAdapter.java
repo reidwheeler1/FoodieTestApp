@@ -92,7 +92,7 @@ public class profileAdapter extends BaseExpandableListAdapter {
         textView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
+
                 String id = MainActivity.items.get(childPosition).getName();
                 String groupId = listGroup.get(groupPosition);
                 Log.d("Profile: onLongClick", id);
