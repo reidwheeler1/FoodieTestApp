@@ -11,6 +11,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -89,7 +92,7 @@ public class profileAdapter extends BaseExpandableListAdapter {
         textView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v) {
-                //Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
+                Toast.makeText(parent.getContext(), "long clicked " + sChild,Toast.LENGTH_SHORT).show();
                 String id = MainActivity.items.get(childPosition).getName();
                 String groupId = listGroup.get(groupPosition);
                 Log.d("Profile: onLongClick", id);
@@ -107,7 +110,15 @@ public class profileAdapter extends BaseExpandableListAdapter {
 
             @Override
             public void onClick(View v) {
-                //Toast.makeText(parent.getContext(), sChild,Toast.LENGTH_SHORT).show();
+                // Launches Restaurant Info Activity
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                // Passing item view Model into restaurant info view model
+                RestaurantInfoViewModel resViewModel = new RestaurantInfoViewModel(MainActivity.items.get(childPosition));
+                // Passing view RestaurantInfoViewModel into fragment
+                Fragment resInfo = new RestaurantInfo(resViewModel);
+                // Replacing view model with new fragment
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view,resInfo).addToBackStack(null).commit();
+                Log.i("DISCOVER", "onClick: CLICKED");
             }
         });
 

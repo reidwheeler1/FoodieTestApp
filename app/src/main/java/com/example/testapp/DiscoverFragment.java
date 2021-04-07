@@ -70,7 +70,6 @@ public class DiscoverFragment extends Fragment {
 
     private void init(View root) {
         gridData = root.findViewById(R.id.discover_recyclerView);
-
         List<ItemModel> items = fetchYelp();
         DiscoverAdapter adapter = new DiscoverAdapter(items);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3);

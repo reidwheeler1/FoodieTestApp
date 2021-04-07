@@ -314,7 +314,7 @@ public class QuizCard extends Fragment {
                 for (int j = 0; j < cats.length(); j++)
                     categories.add(cats.getJSONObject(j).getString("alias"));
 
-                items.add(new ItemModel(image_url,name,price,location,id, categories));
+                items.add(new ItemModel(image_url,name,location,price,id, categories));
             }
 
         } catch (JSONException e){
