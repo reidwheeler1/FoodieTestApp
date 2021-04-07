@@ -2,6 +2,6 @@
     <string name="app_name">Foodie</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hot Plates In Your Area</string>
-    <string name="about_app_text">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</string>
+    <string name="about_app_text">Welcome to Foodie, an app dedicated to matching your in the moment tastes with the restaurants that can satisfy them! \nThe Suggestions tab will help narrow down your restaurant choice when you swipe left and right on the options presented.\nThe Discover tab will allow you to quickly explore all the best available food options in your area. </string>
 
 </resources>
