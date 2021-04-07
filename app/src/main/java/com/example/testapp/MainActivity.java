@@ -141,9 +141,9 @@ GPS functions
 
     void startService(){
 
-        LocationBroadcastReciever reciever = new LocationBroadcastReciever();
+        LocationBroadcastReciever receiver = new LocationBroadcastReciever();
         IntentFilter filter = new IntentFilter("ACT_LOC");
-        registerReceiver(reciever,filter);
+        registerReceiver(receiver,filter);
         Intent intent = new Intent(MainActivity.this, GPS.class);
         startService(intent);
 
