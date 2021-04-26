@@ -248,6 +248,7 @@ public class QuizCard extends Fragment {
     }
 
     private String constructURL() {
+        Log.i("Preferences: ", ProfileFragment.getDietaryPreferencesString());
         String url = "&categories=";
         if (gatheringPreferences) {
             url = url + likedPreferences.get(0).getIdentifier();
