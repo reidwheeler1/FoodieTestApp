@@ -228,8 +228,10 @@ public class QuizCard extends Fragment {
             url = url + likedPreferences.get(0).getIdentifier();
             for (int i = 1; i < likedPreferences.size(); i++)
                 url = url + "," + likedPreferences.get(i).getIdentifier();
+            url = url + ProfileFragment.getDietaryPreferencesString();
         } else
             url = url + identifyCommonCategories();
+        url = url + "&sort_by=rating";
         return url;
     }
 
