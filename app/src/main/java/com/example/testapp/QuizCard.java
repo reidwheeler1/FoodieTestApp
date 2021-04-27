@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DiffUtil;
@@ -36,12 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -67,9 +66,6 @@ public class QuizCard extends Fragment {
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
 
-    //GPS variables
-    static String postalcode;
-
     public QuizCard() {
         super(R.layout.fragment_quiz_card);
     }
@@ -78,7 +74,7 @@ public class QuizCard extends Fragment {
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (rootView == null) {
@@ -182,25 +178,19 @@ public class QuizCard extends Fragment {
         //Start spinner
         progressBar.setVisibility(View.VISIBLE);
         //new thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
-                List<ItemModel> old_items = adapter.getItems();
-                List<ItemModel> new_items = new ArrayList<>(addList());
-                CardStackCallback callback = new CardStackCallback(old_items, new_items);
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-                adapter.setItems(new_items);
-                //run below on UI thread
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                   @Override
-                   public void run() {
-                       gatheringPreferences = false;
-                       result.dispatchUpdatesTo(adapter);
-                       progressBar.setVisibility(View.GONE);
-                   }
-                });
-            }
+        new Thread(() -> {
+            //See: https://developer.android.com/reference/android/support/v7/util/DiffUtil
+            List<ItemModel> old_items = adapter.getItems();
+            List<ItemModel> new_items = new ArrayList<>(addList());
+            CardStackCallback callback = new CardStackCallback(old_items, new_items);
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
+            adapter.setItems(new_items);
+            //run below on UI thread
+            new Handler(Looper.getMainLooper()).post(() -> {
+                gatheringPreferences = false;
+                result.dispatchUpdatesTo(adapter);
+                progressBar.setVisibility(View.GONE);
+            });
         }).start();
     }
 
@@ -223,16 +213,16 @@ public class QuizCard extends Fragment {
 
     private String constructURL() {
         Log.i("Preferences: ", ProfileFragment.getDietaryPreferencesString());
-        String url = "&categories=";
+        StringBuilder _url = new StringBuilder("&categories=");
         if (gatheringPreferences) {
-            url = url + likedPreferences.get(0).getIdentifier();
+            _url.append(likedPreferences.get(0).getIdentifier());
             for (int i = 1; i < likedPreferences.size(); i++)
-                url = url + "," + likedPreferences.get(i).getIdentifier();
-            url = url + ProfileFragment.getDietaryPreferencesString();
+                _url.append(",").append(likedPreferences.get(i).getIdentifier());
+            _url.append(ProfileFragment.getDietaryPreferencesString());
         } else
-            url = url + identifyCommonCategories();
-        url = url + "&sort_by=rating";
-        return url;
+            _url.append(identifyCommonCategories());
+        _url.append("&sort_by=rating");
+        return _url.toString();
     }
 
     private List<ItemModel> addList() {
@@ -300,7 +290,7 @@ public class QuizCard extends Fragment {
     }
 
     private String identifyCommonCategories() {
-        String result = "all";
+        StringBuilder result = new StringBuilder("all");
         int mostCommonCat = -1;
         int secondMostCom = -1;
         Map<String, Integer> catMap = new HashMap<>();
@@ -349,18 +339,18 @@ public class QuizCard extends Fragment {
             count = catMap.get(cat);
             if (firstCatNotYetAdded) {
                 if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
-                    result = cat;
+                    result = new StringBuilder(cat);
                     firstCatNotYetAdded = false;
                 }
             } else if (count == mostCommonCat || (count == secondMostCom && !badCatMap.containsKey(cat))) {
-                result = result + "," + cat;
+                result.append(",").append(cat);
             }
         }
 
-        Log.d("IdentifyCommonCategories", result);
+        Log.d("IdentifyCommonCategories", result.toString());
         currentSetLikedRestaurants.clear(); //Prepare for next set
         currentSetDislikedRestaurants.clear();
-        return result;
+        return result.toString();
     }
 
     private String itemToString (ItemModel item) {
@@ -382,15 +372,15 @@ public class QuizCard extends Fragment {
 
 class Utilities {
     public static String categoriesToString(List<String> list) {
-        String ret = "";
+        StringBuilder res = new StringBuilder();
 
         if (list == null || list.isEmpty())
-            return ret;
+            return "";
 
-        ret += list.get(0);
+        res.append(list.get(0));
         for (int i=1; i<list.size(); i++)
-            ret += ", " + list.get(i);
+            res.append(", ").append(list.get(i));
 
-        return ret;
+        return res.toString();
     }
 }
