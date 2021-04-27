@@ -1,5 +1,7 @@
 package com.example.testapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.Image;
 import android.os.Bundle;
 
@@ -54,24 +56,25 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         // Defines the xml file for the fragment // Inflate the layout for this fragment
 
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_profile, parent, false);
         progressBar = root.findViewById(R.id.loadingPanel);
         SwitchCompat veganSwitch = (SwitchCompat) root.findViewById(R.id.veganSwitch);
         veganSwitch.setOnCheckedChangeListener(onCheckedChanged());
-        veganSwitch.setChecked(vegan);
+        veganSwitch.setChecked(sharedPref.getBoolean("vegan", false));
 
         SwitchCompat vegetarianSwitch = (SwitchCompat) root.findViewById(R.id.vegetarianSwitch);
         vegetarianSwitch.setOnCheckedChangeListener(onCheckedChanged());
-        vegetarianSwitch.setChecked(vegetarian);
+        vegetarianSwitch.setChecked(sharedPref.getBoolean("vegetarian", false));
 
         SwitchCompat glutenSwitch = (SwitchCompat) root.findViewById(R.id.glutenSwitch);
         glutenSwitch.setOnCheckedChangeListener(onCheckedChanged());
-        glutenSwitch.setChecked(gluten);
+        glutenSwitch.setChecked(sharedPref.getBoolean("gluten", false));
 
         SwitchCompat kosherSwitch = (SwitchCompat) root.findViewById(R.id.kosherSwitch);
         kosherSwitch.setOnCheckedChangeListener(onCheckedChanged());
-        kosherSwitch.setChecked(kosher);
+        kosherSwitch.setChecked(sharedPref.getBoolean("kosher", false));
         init(root);
         return root;
 
@@ -111,27 +114,34 @@ public class ProfileFragment extends Fragment {
         return new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.i("onCheckedChanged switch text: ", buttonView.getText().toString());
+                SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
                 switch (buttonView.getId()) {
                     case R.id.veganSwitch:
                         vegan = isChecked;
+                        editor.putBoolean("vegan", isChecked);
                         break;
                     case R.id.vegetarianSwitch:
                         vegetarian = isChecked;
+                        editor.putBoolean("vegetarian", isChecked);
                         break;
                     case R.id.glutenSwitch:
                         gluten = isChecked;
+                        editor.putBoolean("gluten", isChecked);
                         break;
                     case R.id.kosherSwitch:
                         kosher = isChecked;
+                        editor.putBoolean("kosher", isChecked);
                         break;
                 }
+                editor.apply();
             }
         };
     }
 
     public static String getDietaryPreferencesString() {
         //Returns an empty string if no preferences set
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         if (vegan)
             sb.append(",vegan");
         if (vegetarian)
