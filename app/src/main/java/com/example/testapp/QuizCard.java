@@ -50,8 +50,6 @@ import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link QuizCard#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class QuizCard extends Fragment {
 
@@ -59,24 +57,15 @@ public class QuizCard extends Fragment {
     private RelativeLayout progressBar;
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
-    //
     private boolean gatheringPreferences = true; //Set to false in paginate()
     private PreferenceList preferenceList;
     private List<ItemModel> likedPreferences;
     private List<ItemModel> currentSetLikedRestaurants;
     private List<ItemModel> currentSetDislikedRestaurants;
+    private View rootView;
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     //GPS variables
     static String postalcode;
@@ -85,41 +74,26 @@ public class QuizCard extends Fragment {
         super(R.layout.fragment_quiz_card);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment QuizCard.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static QuizCard newInstance(String param1, String param2) {
-        QuizCard fragment = new QuizCard();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_quiz_card, container, false);
-        progressBar = root.findViewById(R.id.loadingPanel);
-        init(root);
-        return root;
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_quiz_card, container, false);
+            progressBar = rootView.findViewById(R.id.loadingPanel);
+            init(rootView);
+        }
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (rootView.getParent() != null)
+            ((ViewGroup)rootView.getParent()).removeView(rootView);
+        super.onDestroyView();
     }
 
     private void init(View root) {
