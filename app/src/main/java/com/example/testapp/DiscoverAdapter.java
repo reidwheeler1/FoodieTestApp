@@ -64,6 +64,8 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.ViewHo
         return restaurants.size();
     }
 
+    public void setRestaurants(List<ItemModel> restaurants) {this.restaurants = restaurants;}
+
     class ViewHolder extends RecyclerView.ViewHolder{
         ImageView gridImage;
         ViewHolder(@NonNull View itemView) {

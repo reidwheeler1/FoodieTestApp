@@ -3,15 +3,19 @@ package com.example.testapp;
 import android.graphics.Rect;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.RelativeLayout;
 
 import com.yuyakaido.android.cardstackview.CardStackView;
 
@@ -40,7 +44,9 @@ public class DiscoverFragment extends Fragment {
 
     // Okhttp Client
     private final OkHttpClient client = new OkHttpClient();
+    private RelativeLayout progressBar;
     RecyclerView gridData;
+    DiscoverAdapter _adapter;
 
     public DiscoverFragment() {
         // Required empty public constructor
@@ -64,30 +70,31 @@ public class DiscoverFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_discover, container, false);
+        progressBar = root.findViewById(R.id.discoverProgressPanel);
         init(root);
         return root;
     }
 
+    //TODO: Fix error "RecyclerView: No adapter attached; skipping layout
     private void init(View root) {
+        progressBar.setVisibility(View.VISIBLE);
         gridData = root.findViewById(R.id.discover_recyclerView);
-        List<ItemModel> items = fetchYelp();
-        DiscoverAdapter adapter = new DiscoverAdapter(items);
+        List<ItemModel> items = new ArrayList<>();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3);
         gridData.setLayoutManager(gridLayoutManager);
-        gridData.setAdapter(adapter);
         final int spacing = 0;
         gridData.setPadding(spacing, spacing, spacing, spacing);
         gridData.setClipToPadding(false);
         gridData.setClipChildren(false);
         gridData.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
                 outRect.set(spacing, spacing, spacing, spacing);
             }
         });
         gridData.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) { //check for scroll down
                     visibleItemCount = gridLayoutManager.getChildCount();
                     totalItemCount = gridLayoutManager.getItemCount();
@@ -97,17 +104,31 @@ public class DiscoverFragment extends Fragment {
                         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                             loading = false;
                             Log.v("...", "Last Item Wow !");
+                            progressBar.setVisibility(View.VISIBLE);
                             // Do pagination.. i.e. fetch new data
-                            List<ItemModel> newItems = fetchYelp();
-                            items.addAll(newItems);
-                            DiscoverAdapter adapter = new DiscoverAdapter(items);
-                            gridData.setAdapter(adapter);
-                            loading = true;
+                            new Thread(() -> {
+                                List<ItemModel> newItems = fetchYelp();
+                                items.addAll(newItems);
+                                DiscoverAdapter adapter = new DiscoverAdapter(items);
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    gridData.setAdapter(adapter);
+                                    loading = true;
+                                    progressBar.setVisibility(View.GONE);
+                                });
+                            }).start();
                         }
                     }
                 }
             }
         });
+        new Thread(() -> {
+            List<ItemModel> _items = fetchYelp();
+            DiscoverAdapter adapter = new DiscoverAdapter(_items);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                gridData.setAdapter(adapter);
+                progressBar.setVisibility(View.GONE);
+            });
+        }).start();
     }
 
 
@@ -118,12 +139,15 @@ public class DiscoverFragment extends Fragment {
         List<ItemModel> items = new ArrayList<>();
 
         String yelpAPIKey = "ON2gpPfKlpMDaoU6OTZy-ES-ibzcfONKyS6VoTTdiVNjrN4rZ60Q3JUN-Lz_DKZtHDMfT6-MBhsTFrukQ-dTppuVw8wvuuUS6OufEsSleuD182x8fUiTYoZHt80uYHYx";
-        String url = "https://api.yelp.com/v3/businesses/search?location="+MainActivity.getPostalcode()+"&sort_by=rating&limit=50";
+        String categories = "&categories=";
+        String preferences = ProfileFragment.getDietaryPreferencesString();
+        categories = (!preferences.isEmpty()) ? categories + preferences.substring(1) : "";
+        String url = "https://api.yelp.com/v3/businesses/search?location="+MainActivity.getPostalcode()+"&sort_by=rating&limit=50"+categories;
         final String[] jsonResponse = new String[1];
 
-        Thread t = new Thread(new Runnable() {
+/*        Thread t = new Thread(new Runnable() {
             @Override
-            public void run() {
+            public void run() {*/
                 Request request = new Request.Builder()
                         .url(url)
                         .header("Authorization", "Bearer " + yelpAPIKey)
@@ -154,16 +178,16 @@ public class DiscoverFragment extends Fragment {
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
-            }
-        });
+/*            }
+        });*/
 
-        t.start();
+/*        t.start();
 
         try {
             t.join();
         } catch (Exception e) {
             Log.e("ERROR", e.toString());
-        }
+        }*/
 
         return items;
     }

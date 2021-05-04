@@ -8,11 +8,9 @@
     tools:context=".ProfileFragment">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
@@ -44,7 +42,7 @@
             android:textColor="@color/foodie_red"
             android:paddingLeft="16dp" />
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/veganSwitch"
             android:text="Vegan"
             android:layout_width="match_parent"
@@ -52,7 +50,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"/>
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/vegetarianSwitch"
             android:text="Vegetarian"
             android:layout_width="match_parent"
@@ -60,7 +58,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"/>
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/glutenSwitch"
             android:text="Gluten-Free"
             android:layout_width="match_parent"
@@ -68,7 +66,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"/>
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/kosherSwitch"
             android:text="Kosher"
             android:layout_width="match_parent"
