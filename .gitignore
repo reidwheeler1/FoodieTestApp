@@ -1,3 +1,21 @@
+#Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+#Java class file
+*.class
+
+#Generated file
+bin/
+gen/
+out/
+
+#Log files
+*.log
+
+#Android studio
 *.iml
 .gradle
 /local.properties
@@ -12,4 +30,5 @@
 /captures
 .externalNativeBuild
 .cxx
+#Local configuration file
 local.properties
